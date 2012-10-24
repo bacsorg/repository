@@ -13,6 +13,11 @@ find_package(Boost COMPONENTS system filesystem serialization iostreams unit_tes
 list(APPEND includes ${Boost_INCLUDE_DIRS})
 list(APPEND libraries ${Boost_LIBRARIES})
 
+# XML-RPC
+find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
+list(APPEND includes ${XMLRPC_INCLUDE_DIRS})
+list(APPEND libraries ${XMLRPC_LIBRARIES})
+
 # Local
 include_directories(include ${includes})
 
