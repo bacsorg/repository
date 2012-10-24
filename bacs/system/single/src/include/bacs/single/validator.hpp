@@ -2,22 +2,36 @@
 
 #include "bacs/single/common.hpp"
 
+#include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 
-namespace bacs{namespace single{namespace validator
+namespace bacs{namespace single
 {
-    struct result
+    /// \note must be implemented in problem
+    class validator: private boost::noncopyable
     {
-        enum status_type
+    public:
+        struct result
         {
-            OK,
-            FAIL
+            enum status_type
+            {
+                OK,
+                FAIL
+            };
+
+            status_type status = OK;
+            boost::optional<std::string> message;
         };
 
-        status_type status;
-        boost::optional<std::string> message;
-    };
+    public:
+        validator();
+        ~validator();
 
-    /// \note must be implemented in problem
-    result validate(const file_map &test_files);
-}}}
+        result validate(const file_map &test_files);
+
+    private:
+        class impl;
+
+        impl *pimpl;
+    };
+}}
