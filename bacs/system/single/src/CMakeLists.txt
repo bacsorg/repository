@@ -46,6 +46,8 @@ add_executable(${PROJECT_NAME}
     src/bin/main.cpp
 
     src/lib/callback.cpp
+
+    src/lib/callbacks/xmlrpc.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${libraries})
 
