@@ -1,9 +1,12 @@
 #include "bacs/single/validator.hpp"
 
-namespace bacs{namespace single{namespace validator
+namespace bacs{namespace single
 {
-    result validate(const file_map &test_files)
+    validator::validator() {}
+    validator::~validator() {}
+
+    validator::result validator::validate(const file_map &test_files)
     {
         return result();
     }
-}}}
+}}}}
