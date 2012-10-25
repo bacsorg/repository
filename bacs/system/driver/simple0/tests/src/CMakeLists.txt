@@ -16,6 +16,9 @@ list(APPEND libraries ${Boost_LIBRARIES})
 # bunsan
 list(APPEND libraries bunsan_common)
 
+# yandex_contest
+list(APPEND libraries yandex_contest_common)
+
 # Includes and libraries
 include_directories(${includes})
 
