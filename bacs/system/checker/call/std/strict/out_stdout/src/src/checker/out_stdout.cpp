@@ -7,7 +7,7 @@ namespace bacs{namespace single
     checker::checker() {}
     checker::~checker() {}
 
-    result::result checker::check(const file_map &test_files, const file_map &solution_files)
+    checker::result checker::check(const file_map &test_files, const file_map &solution_files)
     {
         result result_;
         boost::filesystem::ifstream hint(test_files.at("out"), std::ios::binary),
