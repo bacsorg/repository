@@ -13,6 +13,9 @@ find_package(Boost COMPONENTS system filesystem serialization iostreams unit_tes
 list(APPEND includes ${Boost_INCLUDE_DIRS})
 list(APPEND libraries ${Boost_LIBRARIES})
 
+# bunsan
+list(APPEND libraries bunsan_common)
+
 # Includes and libraries
 include_directories(${includes})
 
@@ -30,8 +33,9 @@ set(tests_src_dir ${PROJECT_SOURCE_DIR}/share/tests)
 
 file(GLOB tests_src ${tests_src_dir}/*)
 
-set(tests_dst_dir ${PROJECT_BINARY_DIR}/tests)
+set(tests_dst_dir ${PROJECT_BINARY_DIR}/tests_dir)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${tests_dst_dir})
+set(tests_info ${PROJECT_BINARY_DIR}/tests)
 
 set(tests_dst)
 foreach(test ${tests_src})
@@ -44,10 +48,11 @@ if(tests_dst_size EQUAL 0)
 endif()
 
 add_custom_command(OUTPUT ${tests_dst}
-    DEPENDS ${tests}
-    COMMAND ${PROJECT_NAME} ${tests_dst_dir} ${tests_src}
+    DEPENDS ${tests_info} ${tests}
+    COMMAND ${PROJECT_NAME} ${tests_info} ${tests_dst_dir} ${tests_src}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-add_custom_target(tests ALL DEPENDS ${tests_dst})
+add_custom_target(tests ALL DEPENDS ${tests_info} ${tests_dst})
 
 # Installation
 install(FILES ${tests_dst} DESTINATION share/tests)
+install(FILES ${tests_info} DESTINATION etc)
