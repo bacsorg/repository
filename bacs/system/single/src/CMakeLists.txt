@@ -63,4 +63,4 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 
-yandex_contest_tests()
+#yandex_contest_tests()
