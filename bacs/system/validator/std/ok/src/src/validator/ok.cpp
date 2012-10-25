@@ -9,4 +9,4 @@ namespace bacs{namespace single
     {
         return result();
     }
-}}}}
+}}
