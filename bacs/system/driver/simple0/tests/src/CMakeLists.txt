@@ -38,7 +38,8 @@ file(GLOB tests_src ${tests_src_dir}/*)
 
 set(tests_dst_dir ${PROJECT_BINARY_DIR}/tests_dir)
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${tests_dst_dir})
-set(tests_info ${PROJECT_BINARY_DIR}/tests)
+set(tests_info_src ${PROJECT_SOURCE_DIR}/etc/tests)
+set(tests_info_dst ${PROJECT_BINARY_DIR}/tests)
 
 set(tests_dst)
 foreach(test ${tests_src})
@@ -50,12 +51,12 @@ if(tests_dst_size EQUAL 0)
     message(SEND_ERROR "No tests found at ${tests_src_dir}.")
 endif()
 
-add_custom_command(OUTPUT ${tests_dst}
-    DEPENDS ${tests_info} ${tests}
-    COMMAND ${PROJECT_NAME} ${tests_info} ${tests_dst_dir} ${tests_src}
+add_custom_command(OUTPUT ${tests_info_dst} ${tests_dst}
+    DEPENDS ${tests_info_src} ${tests_src}
+    COMMAND ${PROJECT_NAME} ${tests_info_dst} ${tests_dst_dir} ${tests_src}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-add_custom_target(tests ALL DEPENDS ${tests_info} ${tests_dst})
+add_custom_target(tests_target ALL DEPENDS ${tests_info_dst} ${tests_dst})
 
 # Installation
 install(FILES ${tests_dst} DESTINATION share/tests)
-install(FILES ${tests_info} DESTINATION etc)
+install(FILES ${tests_info_dst} DESTINATION etc)
