@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include <boost/noncopyable.hpp>
+#include <boost/filesystem/path.hpp>
 
 namespace bacs{namespace single
 {
