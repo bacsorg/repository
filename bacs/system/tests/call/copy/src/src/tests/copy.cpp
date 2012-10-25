@@ -1,9 +1,13 @@
 #include "bunsan/config.hpp"
+#include "bunsan/system_error.hpp"
 
 #include "bacs/single/tests.hpp"
 
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/fstream.hpp>
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/string.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include "yandex/contest/serialization/unordered_set.hpp"
 
@@ -46,7 +50,8 @@ namespace bacs{namespace single
     void tests::create(const std::string &test_id, const std::string &data_id,
                        const boost::filesystem::path &path)
     {
-        boost::filesystem::copy_file("share/tests" / (test_id + "." + data_id), path);
+        boost::filesystem::copy_file(boost::filesystem::path("share/tests") /
+                                        (test_id + "." + data_id), path);
     }
 
     std::unordered_set<std::string> tests::data_set()
