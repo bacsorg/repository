@@ -2,15 +2,19 @@
 
 #include "bacs/single/error.hpp"
 
+#include "bacs/single/api/pb/task.pb.h"
 #include "bacs/single/api/pb/result.pb.h"
+#include "bacs/single/api/pb/intermediate.pb.h"
 
 #include "bunsan/factory_helper.hpp"
 
 #include <string>
 #include <vector>
+#include <iterator>
 
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 namespace bacs{namespace single{namespace callback
 {
@@ -25,30 +29,56 @@ namespace bacs{namespace single{namespace callback
     struct intermediate_serialization_error:
         virtual intermediate_error, virtual serialization_error {};
 
-    class result: private boost::noncopyable
-    BUNSAN_FACTORY_BEGIN(result, const std::vector<std::string> &/*arguments*/)
+    class base: private boost::noncopyable
+    BUNSAN_FACTORY_BEGIN(base, const std::vector<std::string> &/*arguments*/)
     public:
-        virtual ~result() {}
+        virtual ~base() {}
 
     public:
-        virtual void call(const api::pb::result::Result &result)=0;
-    BUNSAN_FACTORY_END(result)
-
-    class intermediate: private boost::noncopyable
-    BUNSAN_FACTORY_BEGIN(intermediate, const std::vector<std::string> &/*arguments*/)
-    public:
-        virtual ~intermediate() {}
+        static base_ptr instance(const api::pb::task::Callback &config);
 
     public:
-        virtual void call(const std::vector<std::string> &state)=0;
+        typedef std::vector<unsigned char> data_type;
 
-        template <typename ... Args>
-        void call(Args &&...args)
+    public:
+        virtual void call(const data_type &data)=0;
+
+        template <typename T>
+        void call(const T &obj)
         {
-            const std::vector<std::string> &state = {
-                boost::lexical_cast<std::string>(args)...
-            };
-            call(state);
+            call(begin(obj), end(obj));
         }
-    BUNSAN_FACTORY_END(intermediate)
+
+        template <typename Iter>
+        void call(const Iter &begin, const Iter &end)
+        {
+            typedef std::iterator_traits<Iter> traits;
+            static_assert(sizeof(traits::value_type) == sizeof(data_type::value_type), "Sizes should be equal.");
+            const auto to_uc =
+                [](const typename traits::value_type c)
+                {
+                    return data_type::value_type(c);
+                };
+            call(data_type(boost::make_transform_iterator(begin, to_uc),
+                           boost::make_transform_iterator(end, to_uc)));
+        }
+    BUNSAN_FACTORY_END(base)
+
+    template <typename T>
+    class interface
+    {
+    public:
+        explicit interface(const base_ptr &base_): m_base(base_) {}
+
+        explicit interface(const api::pb::task::Callback &config):
+            interface(base::instance(config)) {}
+
+        void call(const T &obj)
+        {
+            // TODO
+        }
+
+    private:
+        const base_ptr m_base;
+    };
 }}}
