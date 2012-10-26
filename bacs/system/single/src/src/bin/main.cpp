@@ -1,4 +1,5 @@
-#include "bacs/single/api/pb/task.pb.h"
+#include "bacs/single/callback.hpp"
+#include "bacs/single/checker.hpp"
 
 #include "yandex/contest/TypeInfo.hpp"
 #include "yandex/contest/system/Trace.hpp"
@@ -18,6 +19,16 @@ int main(int argc, char *argv[])
         (void) argv;
         api::pb::task::Task task;
         task.ParseFromIstream(&std::cin);
+        api::pb::result::Result result;
+        // TODO check hash
+        result.mutable_system()->set_status(api::pb::result::SystemResult::OK);
+        // TODO init callbacks
+        bacs::single::callback::result result_cb(task.callbacks().result());
+        bacs::single::callback::intermediate intermediate_cb;
+        if (task.callbacks().has_intermediate())
+            intermediate_cb.assign(task.callbacks().intermediate());
+        // TODO build solution
+        // TODO test all
     }
     catch (std::exception &e)
     {
