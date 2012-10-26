@@ -68,10 +68,26 @@ namespace bacs{namespace single{namespace callback
     class interface
     {
     public:
+        interface()=default;
+        interface(const interface &)=default;
+        interface &operator=(const interface &)=default;
+
         explicit interface(const base_ptr &base_): m_base(base_) {}
 
         explicit interface(const api::pb::task::Callback &config):
             interface(base::instance(config)) {}
+
+        template <typename Y>
+        void assign(Y &&y)
+        {
+            interface(y).swap(*this);
+        }
+
+        void swap(interface &iface) noexcept
+        {
+            using boost::swap;
+            swap(m_base, iface.m_base);
+        }
 
         void call(const T &obj) const
         {
@@ -81,12 +97,19 @@ namespace bacs{namespace single{namespace callback
     private:
         void call(const google::protobuf::MessageLite &message) const
         {
-            m_base->call(message.SerializeAsString());
+            if (m_base)
+                m_base->call(message.SerializeAsString());
         }
 
     private:
-        const base_ptr m_base;
+        base_ptr m_base;
     };
+
+    template <typename T>
+    void swap(interface<T> &a, interface<T> &b) noexcept
+    {
+        a.swap(b);
+    }
 
     typedef interface<api::pb::result::Result> result;
     typedef interface<api::pb::intermediate::IntermediateResult> intermediate;
