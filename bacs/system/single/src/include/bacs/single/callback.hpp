@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <functional>
 
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
@@ -53,9 +54,10 @@ namespace bacs{namespace single{namespace callback
         void call(const Iter &begin, const Iter &end)
         {
             typedef std::iterator_traits<Iter> traits;
-            static_assert(sizeof(traits::value_type) == sizeof(data_type::value_type), "Sizes should be equal.");
-            const auto to_uc =
-                [](const typename traits::value_type c)
+            typedef typename traits::value_type value_type;
+            static_assert(sizeof(value_type) == sizeof(data_type::value_type), "Sizes should be equal.");
+            const std::function<data_type::value_type (const value_type)> to_uc =
+                [](const value_type c)
                 {
                     return data_type::value_type(c);
                 };
@@ -95,7 +97,7 @@ namespace bacs{namespace single{namespace callback
         }
 
     private:
-        void call(const google::protobuf::MessageLite &message) const
+        void call_(const google::protobuf::MessageLite &message) const
         {
             if (m_base)
                 m_base->call(message.SerializeAsString());
