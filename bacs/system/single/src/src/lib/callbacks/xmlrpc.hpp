@@ -4,32 +4,24 @@
 
 #include <utility>
 
-namespace bacs{namespace single{namespace callback{namespace detail
+#include <xmlrpc-c/client_simple.hpp>
+
+namespace bacs{namespace single{namespace callback{namespace callbacks
 {
-    class xmlrpc_base: private boost::noncopyable
+    class xmlrpc: public base
     {
     public:
-        explicit xmlrpc_base(const std::vector<std::string> &arguments);
+        explicit xmlrpc(const std::vector<std::string> &arguments);
 
-    };
+        void call(const data_type &data) override;
 
-    class xmlrpc_result: public result, public xmlrpc_base
-    {
-    public:
-        template <typename ... Args>
-        explicit xmlrpc_result(Args &&...args):
-            xmlrpc_base(std::forward<Args>(args)...) {}
+    private:
+        xmlrpc_c::clientSimple m_proxy;
+        std::string m_uri;
+        std::string m_method;
+        xmlrpc_c::paramList m_arguments;
 
-        void call(const api::pb::result::Result &result) override;
-    };
-
-    class xmlrpc_intermediate: public intermediate, public xmlrpc_base
-    {
-    public:
-        template <typename ... Args>
-        explicit xmlrpc_intermediate(Args &&...args):
-            xmlrpc_base(std::forward<Args>(args)...) {}
-
-        void call(const std::vector<std::string> &state) override;
+    private:
+        static bool factory_reg_hook;
     };
 }}}}
