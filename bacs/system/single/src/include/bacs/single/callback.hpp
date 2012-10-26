@@ -73,12 +73,21 @@ namespace bacs{namespace single{namespace callback
         explicit interface(const api::pb::task::Callback &config):
             interface(base::instance(config)) {}
 
-        void call(const T &obj)
+        void call(const T &obj) const
         {
-            // TODO
+            call_(obj);
+        }
+
+    private:
+        void call(const google::protobuf::MessageLite &message) const
+        {
+            m_base->call(message.SerializeAsString());
         }
 
     private:
         const base_ptr m_base;
     };
+
+    typedef interface<api::pb::result::Result> result;
+    typedef interface<api::pb::intermediate::IntermediateResult> intermediate;
 }}}
