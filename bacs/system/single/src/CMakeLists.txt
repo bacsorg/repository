@@ -50,6 +50,7 @@ add_executable(${PROJECT_NAME}
     ${sources}
     src/bin/main.cpp
 
+    src/lib/testing.cpp
     src/lib/callback.cpp
 
     src/lib/callbacks/xmlrpc.cpp
