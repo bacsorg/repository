@@ -36,6 +36,7 @@ list(APPEND libraries bunsan_bacs_single_api)
 list(APPEND libraries
     yandex_contest_common
     yandex_contest_system
+    yandex_contest_invoker
 )
 
 file(GLOB_RECURSE modules ${CMAKE_SOURCE_DIR}/modules/*.cmake)
@@ -52,6 +53,7 @@ add_executable(${PROJECT_NAME}
 
     src/lib/tests.cpp
     src/lib/testing.cpp
+    src/lib/testing_impl.cpp
     src/lib/callback.cpp
 
     src/lib/callbacks/xmlrpc.cpp

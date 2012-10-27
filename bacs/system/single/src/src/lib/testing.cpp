@@ -1,9 +1,14 @@
 #include "bacs/single/testing.hpp"
 
+#include "yandex/contest/invoker/All.hpp"
+
 namespace bacs{namespace single
 {
+    using namespace yandex::contest::invoker;
+
     testing::testing(const api::pb::task::Callbacks &callbacks):
-        m_result_cb(callbacks.result())
+        m_result_cb(callbacks.result()),
+        m_container(Container::create(ContainerConfig::fromEnvironment()))
     {
         if (callbacks.has_intermediate())
             m_intermediate_cb.assign(callbacks.intermediate());
@@ -22,17 +27,6 @@ namespace bacs{namespace single
     {
         // TODO
         m_result.mutable_system()->set_status(api::pb::result::SystemResult::OK);
-        return true;
-    }
-
-    bool testing::build(const api::pb::task::Solution &solution)
-    {
-        m_intermediate.set_state(api::pb::intermediate::BUILDING);
-        send_intermediate();
-        // TODO
-        api::pb::result::BuildResult &build = *m_result.mutable_build();
-        build.set_output("TODO");
-        build.mutable_execution()->set_status(api::pb::result::Execution::OK);
         return true;
     }
 
@@ -57,22 +51,33 @@ namespace bacs{namespace single
                        api::pb::result::SolutionTestingResult &result)
     {
         m_intermediate.set_state(api::pb::intermediate::TESTING);
-        // TODO
+        // TODO test group dependencies
+        for (const api::pb::testing::TestGroup &test_group: testing.test_groups())
+            test(test_group, *result.add_test_groups());
     }
 
-    void testing::test(const api::pb::testing::TestGroup &test_group,
+    bool testing::test(const api::pb::testing::TestGroup &test_group,
                        api::pb::result::TestGroupResult &result)
     {
         m_intermediate.set_test_group_id(test_group.id());
-        // TODO
-    }
-
-    void testing::test(const api::pb::settings::TestGroupSettings &settings,
-                       const std::string &test_id,
-                       api::pb::result::TestResult &result)
-    {
-        m_intermediate.set_test_id(test_id);
-        send_intermediate();
-        // TODO
+        const api::pb::settings::TestGroupSettings &settings = test_group.settings();
+        const std::unordered_set<std::string> test_set = m_tests.test_set(test_group.test_set());
+        std::vector<std::string> test_order(test_set.begin(), test_set.end());
+        // TODO sort settings.run().order()
+        for (const std::string &test_id: test_order)
+        {
+            const bool ret = test(settings, test_id, *result.add_tests());
+            switch (settings.run().algorithm())
+            {
+            case api::pb::settings::Run::ALL:
+                // ret does not matter
+                break;
+            case api::pb::settings::Run::WHILE_NOT_FAIL:
+                if (!ret)
+                    return false;
+                break;
+            }
+        }
+        return true; // note: empty test group is OK
     }
 }}
