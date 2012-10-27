@@ -2,6 +2,13 @@
 
 #include "yandex/contest/invoker/All.hpp"
 
+#include <algorithm>
+#include <functional>
+
+#include <cstdint>
+
+#include <boost/algorithm/string/classification.hpp>
+
 namespace bacs{namespace single
 {
     using namespace yandex::contest::invoker;
@@ -63,7 +70,28 @@ namespace bacs{namespace single
         const api::pb::settings::TestGroupSettings &settings = test_group.settings();
         const std::unordered_set<std::string> test_set = m_tests.test_set(test_group.test_set());
         std::vector<std::string> test_order(test_set.begin(), test_set.end());
-        // TODO sort settings.run().order()
+        std::function<bool (const std::string &, const std::string &)> less;
+        switch (settings.run().order())
+        {
+        case api::pb::settings::Run::NUMERIC:
+            less =
+                [](const std::string &left, const std::string &right)
+                {
+                    return boost::lexical_cast<std::uint64_t>(left) <
+                           boost::lexical_cast<std::uint64_t>(right);
+                };
+            // strip from non-integer values
+            test_order.erase(std::remove_if(test_order.begin(), test_order.end(),
+                [](const std::string &s)
+                {
+                    return !std::all_of(s.begin(), s.end(), boost::algorithm::is_digit());
+                }), test_order.end());
+            break;
+        case api::pb::settings::Run::LEXICOGRAPHICAL:
+            less = std::less<std::string>();
+            break;
+        }
+        std::sort(test_order.begin(), test_order.end(), less);
         for (const std::string &test_id: test_order)
         {
             const bool ret = test(settings, test_id, *result.add_tests());
