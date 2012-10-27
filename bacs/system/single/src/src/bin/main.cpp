@@ -1,4 +1,5 @@
 #include "bacs/single/testing.hpp"
+#include "bacs/single/error.hpp"
 
 #include "yandex/contest/TypeInfo.hpp"
 #include "yandex/contest/system/Trace.hpp"
@@ -18,8 +19,8 @@ int main(int argc, char *argv[])
         (void) argv;
         api::pb::task::Task task;
         if (!task.ParseFromIstream(&std::cin))
-            BOOST_THROW_EXCEPTION(bunsan::error() <<
-                                  bunsan::error::message("Unable to parse task."));
+            BOOST_THROW_EXCEPTION(bacs::single::error() <<
+                                  bacs::single::error::message("Unable to parse task."));
         testing testing_(task.callbacks());
         testing_.test(task.solution(), task.testing());
     }
