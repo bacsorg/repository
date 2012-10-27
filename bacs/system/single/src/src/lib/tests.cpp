@@ -53,31 +53,61 @@ namespace bacs{namespace single
             class wildcard: public impl
             {
             public:
-                explicit wildcard(const std::string &wildcard_):
-                    m_wildcard(wildcard_) {}
+                explicit wildcard(const api::pb::testing::WildcardQuery &query):
+                    m_wildcard(query.value()), m_flags(flags(query)) {}
 
                 bool match(const std::string &test_id) const override
                 {
-                    // TODO FNM_CASEFOLD
-                    return ::fnmatch(m_wildcard.c_str(), test_id.c_str(), 0);
+                    return ::fnmatch(m_wildcard.c_str(), test_id.c_str(), m_flags);
+                }
+
+            private:
+                int flags(const api::pb::testing::WildcardQuery &query)
+                {
+                    int flags_ = 0;
+                    for (const int flag: query.flags())
+                    {
+                        switch (static_cast<api::pb::testing::WildcardQuery::Flag>(flag))
+                        {
+                        case api::pb::testing::WildcardQuery::IGNORE_CASE:
+                            flags_ |= FNM_CASEFOLD;
+                            break;
+                        }
+                    }
+                    return flags_;
                 }
 
             private:
                 const std::string m_wildcard;
+                int m_flags;
             };
 
             class regex: public impl
             {
             public:
                 explicit regex(const api::pb::testing::RegexQuery &query):
-                    m_regex(query.value())
-                {
-                    // TODO flags
-                }
+                    m_regex(query.value(), flags(query)) {}
 
                 bool match(const std::string &test_id) const override
                 {
                     return boost::regex_match(test_id, m_regex);
+                }
+
+            private:
+                boost::regex_constants::syntax_option_type flags(
+                    const api::pb::testing::RegexQuery &query)
+                {
+                    boost::regex_constants::syntax_option_type flags_ = boost::regex_constants::normal;
+                    for (const int flag: query.flags())
+                    {
+                        switch (static_cast<api::pb::testing::RegexQuery::Flag>(flag))
+                        {
+                        case api::pb::testing::RegexQuery::IGNORE_CASE:
+                            flags_ |= boost::regex_constants::icase;
+                            break;
+                        }
+                    }
+                    return flags_;
                 }
 
             private:
