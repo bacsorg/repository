@@ -114,5 +114,5 @@ namespace bacs{namespace single{namespace callback
     }
 
     typedef interface<api::pb::result::Result> result;
-    typedef interface<api::pb::intermediate::IntermediateResult> intermediate;
+    typedef interface<api::pb::intermediate::Result> intermediate;
 }}}
