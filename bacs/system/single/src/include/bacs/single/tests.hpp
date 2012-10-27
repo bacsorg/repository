@@ -1,5 +1,9 @@
 #pragma once
 
+#include "bacs/single/api/pb/testing.pb.h"
+
+#include "bacs/single/error.hpp"
+
 #include <string>
 #include <unordered_set>
 
@@ -8,6 +12,8 @@
 
 namespace bacs{namespace single
 {
+    struct invalid_test_query_error: virtual error {};
+
     /// \note must be implemented in problem
     class tests: private boost::noncopyable
     {
@@ -21,6 +27,10 @@ namespace bacs{namespace single
         std::unordered_set<std::string> data_set();
 
         std::unordered_set<std::string> test_set();
+
+        /// \note implemented
+        std::unordered_set<std::string> test_set(
+            const google::protobuf::RepeatedPtrField<api::pb::testing::TestQuery> &test_query);
 
     private:
         class impl;

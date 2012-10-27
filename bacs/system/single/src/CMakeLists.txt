@@ -9,7 +9,7 @@ include(YandexContestCommon)
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options thread REQUIRED)
+find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options regex thread REQUIRED)
 list(APPEND includes ${Boost_INCLUDE_DIRS})
 list(APPEND libraries ${Boost_LIBRARIES})
 
@@ -50,6 +50,7 @@ add_executable(${PROJECT_NAME}
     ${sources}
     src/bin/main.cpp
 
+    src/lib/tests.cpp
     src/lib/testing.cpp
     src/lib/callback.cpp
 
