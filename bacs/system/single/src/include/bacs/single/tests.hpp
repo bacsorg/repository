@@ -21,8 +21,10 @@ namespace bacs{namespace single
         tests();
         ~tests();
 
-        void create(const std::string &test_id, const std::string &data_id,
-                    const boost::filesystem::path &path);
+        void copy(const std::string &test_id, const std::string &data_id,
+                  const boost::filesystem::path &path);
+
+        boost::filesystem::path location(const std::string &test_id, const std::string &data_id);
 
         std::unordered_set<std::string> data_set();
 
