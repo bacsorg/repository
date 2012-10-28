@@ -1,8 +1,8 @@
-#include "bacs/single/process.hpp"
+#include "bacs/single/detail/process.hpp"
 
 #include "yandex/contest/invoker/All.hpp"
 
-namespace bacs{namespace single{namespace process
+namespace bacs{namespace single{namespace detail{namespace process
 {
     using namespace yandex::contest::invoker;
 
@@ -28,4 +28,4 @@ namespace bacs{namespace single{namespace process
         }
 #undef RLIM_UPDATE
     }
-}}}
+}}}}
