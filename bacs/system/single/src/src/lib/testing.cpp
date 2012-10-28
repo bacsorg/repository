@@ -94,7 +94,7 @@ namespace bacs{namespace single
         std::sort(test_order.begin(), test_order.end(), less);
         for (const std::string &test_id: test_order)
         {
-            const bool ret = test(settings, test_id, *result.add_tests());
+            const bool ret = test(settings.process(), test_id, *result.add_tests());
             switch (settings.run().algorithm())
             {
             case api::pb::settings::Run::ALL:

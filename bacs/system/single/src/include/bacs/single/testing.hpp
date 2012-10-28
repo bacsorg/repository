@@ -33,20 +33,22 @@ namespace bacs{namespace single
         void send_result();
 
     private:
+        /// Test submit.
         void test(const api::pb::testing::SolutionTesting &testing,
                   api::pb::result::SolutionTestingResult &result);
 
+        /// Test single test group.
         bool test(const api::pb::testing::TestGroup &test_group,
                   api::pb::result::TestGroupResult &result);
 
-        bool test(const api::pb::settings::TestGroupSettings &settings,
+        /// Test single test.
+        bool test(const api::pb::settings::ProcessSettings &settings,
                   const std::string &test_id,
                   api::pb::result::TestResult &result);
 
     private:
         tests m_tests;
         checker m_checker;
-        validator m_validator;
         callback::result m_result_cb;
         callback::intermediate m_intermediate_cb;
         api::pb::intermediate::Result m_intermediate;
