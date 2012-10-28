@@ -54,7 +54,7 @@ add_executable(${PROJECT_NAME}
     src/lib/tests.cpp
     src/lib/process.cpp
     src/lib/testing.cpp
-    src/lib/testing_impl.cpp
+    src/lib/testing_test.cpp
     src/lib/callback.cpp
 
     src/lib/callbacks/xmlrpc.cpp
