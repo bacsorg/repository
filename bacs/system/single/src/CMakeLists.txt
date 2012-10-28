@@ -52,6 +52,7 @@ add_executable(${PROJECT_NAME}
     src/bin/main.cpp
 
     src/lib/tests.cpp
+    src/lib/process.cpp
     src/lib/testing.cpp
     src/lib/testing_impl.cpp
     src/lib/callback.cpp
