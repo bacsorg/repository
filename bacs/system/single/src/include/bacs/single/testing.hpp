@@ -3,7 +3,7 @@
 #include "bacs/single/callback.hpp"
 #include "bacs/single/tests.hpp"
 #include "bacs/single/checker.hpp"
-#include "bacs/single/validator.hpp"
+#include "bacs/single/builder.hpp"
 
 #include "bacs/single/api/pb/settings.pb.h"
 #include "bacs/single/api/pb/testing.pb.h"
@@ -49,6 +49,8 @@ namespace bacs{namespace single
     private:
         tests m_tests;
         checker m_checker;
+        builder_ptr m_builder;
+        solution_ptr m_solution;
         callback::result m_result_cb;
         callback::intermediate m_intermediate_cb;
         api::pb::intermediate::Result m_intermediate;

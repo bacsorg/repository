@@ -22,7 +22,7 @@ namespace bacs{namespace single
         send_intermediate();
         // TODO
         const ProcessGroupPointer process_group = m_container->createProcessGroup();
-        const ProcessPointer process;// = process_group->createProcess(); // TODO somehow with executable, arguments initialized
+        const ProcessPointer process = m_solution->create(process_group, settings.execution().arguments());
         detail::process::setup(settings.resource_limits(), process_group, process);
         const boost::filesystem::path current_path = "/tmp/testiing";
         const unistd::access::Id owner{1000, 1000};
@@ -57,12 +57,7 @@ namespace bacs{namespace single
         process->setOwnerId(owner);
         // note: ignore current_path from settings.execution()
         process->setCurrentPath(current_path);
-        {
-            ProcessArguments arguments = process->arguments();
-            arguments.insert(arguments.end(), begin(settings.execution().arguments()),
-                             end(settings.execution().arguments()));
-            process->setArguments(arguments);
-        }
+        // note: arguments is already set
         for (const api::pb::settings::Execution::Redirection &redirection: settings.execution().redirections())
         {
             const auto iter = files.find(redirection.file_id());

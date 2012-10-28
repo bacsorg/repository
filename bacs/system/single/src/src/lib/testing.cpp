@@ -23,17 +23,6 @@ namespace bacs{namespace single
         send_intermediate();
     }
 
-    bool testing::build(const api::pb::task::Solution &solution)
-    {
-        m_intermediate.set_state(api::pb::intermediate::BUILDING);
-        send_intermediate();
-        // TODO
-        api::pb::result::BuildResult &build = *m_result.mutable_build();
-        build.set_output("TODO");
-        build.mutable_execution()->set_status(api::pb::result::Execution::OK);
-        return true;
-    }
-
     void testing::test(const api::pb::task::Solution &solution,
                        const api::pb::testing::SolutionTesting &testing)
     {
@@ -46,6 +35,17 @@ namespace bacs{namespace single
         // TODO
         m_result.mutable_system()->set_status(api::pb::result::SystemResult::OK);
         return true;
+    }
+
+    bool testing::build(const api::pb::task::Solution &solution)
+    {
+        m_intermediate.set_state(api::pb::intermediate::BUILDING);
+        send_intermediate();
+        m_builder = builder::instance(solution.build().builder());
+        m_solution = m_builder->build(solution.source(),
+                                      solution.build().resource_limits(),
+                                      *m_result.mutable_build());
+        return static_cast<bool>(m_solution);
     }
 
     bool testing::test(const api::pb::testing::SolutionTesting &testing)
