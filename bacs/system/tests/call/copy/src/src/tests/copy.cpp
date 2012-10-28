@@ -47,11 +47,15 @@ namespace bacs{namespace single
         delete pimpl;
     }
 
-    void tests::create(const std::string &test_id, const std::string &data_id,
-                       const boost::filesystem::path &path)
+    void tests::copy(const std::string &test_id, const std::string &data_id,
+                     const boost::filesystem::path &path)
     {
-        boost::filesystem::copy_file(boost::filesystem::path("share/tests") /
-                                        (test_id + "." + data_id), path);
+        boost::filesystem::copy_file(location(test_id, data_id), path);
+    }
+
+    boost::filesystem::path tests::location(const std::string &test_id, const std::string &data_id)
+    {
+        return boost::filesystem::path("share/tests") / (test_id + "." + data_id);
     }
 
     std::unordered_set<std::string> tests::data_set()
