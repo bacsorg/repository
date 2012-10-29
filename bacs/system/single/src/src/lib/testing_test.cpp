@@ -35,6 +35,7 @@ namespace bacs{namespace single
         }
         struct receive_type
         {
+            std::string id;
             boost::filesystem::path path;
             api::pb::settings::File::Range range;
         };
@@ -55,7 +56,7 @@ namespace bacs{namespace single
             m_container->filesystem().setOwnerId(location, owner);
             m_container->filesystem().setMode(location, detail::file::mode(file.permissions()) & 0700);
             if (file.has_receive())
-                receive.push_back({path, file.receive()});
+                receive.push_back({file.id(), path, file.receive()});
         }
         // Execution
         process->setOwnerId(owner);
@@ -86,8 +87,64 @@ namespace bacs{namespace single
         const Process::Result process_result = process->result();
         // fill result
         result.set_id(test_id);
-        // TODO execution result
-        // TODO files
+        {
+            api::pb::result::Execution &execution = *result.mutable_execution();
+            switch (process_group_result.completionStatus)
+            {
+            case ProcessGroup::Result::CompletionStatus::OK:
+            case ProcessGroup::Result::CompletionStatus::ABNORMAL_EXIT:
+                switch (process_result.completionStatus)
+                {
+                case Process::Result::CompletionStatus::OK:
+                    execution.set_status(api::pb::result::Execution::OK);
+                    break;
+                case Process::Result::CompletionStatus::ABNORMAL_EXIT:
+                    execution.set_status(api::pb::result::Execution::ABNORMAL_EXIT);
+                    break;
+                case Process::Result::CompletionStatus::MEMORY_LIMIT_EXCEEDED:
+                    execution.set_status(api::pb::result::Execution::MEMORY_LIMIT_EXCEEDED);
+                    break;
+                case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
+                    execution.set_status(api::pb::result::Execution::TIME_LIMIT_EXCEEDED);
+                    break;
+                case Process::Result::CompletionStatus::OUTPUT_LIMIT_EXCEEDED:
+                    execution.set_status(api::pb::result::Execution::OUTPUT_LIMIT_EXCEEDED);
+                    break;
+                case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
+                case Process::Result::CompletionStatus::START_FAILED:
+                case Process::Result::CompletionStatus::STOPPED:
+                    execution.set_status(api::pb::result::Execution::FAILED);
+                    break;
+                }
+                break;
+            case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
+                execution.set_status(api::pb::result::Execution::REAL_TIME_LIMIT_EXCEEDED);
+                break;
+            case ProcessGroup::Result::CompletionStatus::STOPPED:
+                execution.set_status(api::pb::result::Execution::FAILED);
+                break;
+            }
+            if (process_result.exitStatus)
+                execution.set_exit_status(process_result.exitStatus.get());
+            if (process_result.termSig)
+                execution.set_term_sig(process_result.termSig.get());
+            {
+                api::pb::ResourceUsage &resource_usage = *execution.mutable_resource_usage();
+                resource_usage.set_time_usage_millis(std::chrono::duration_cast<std::chrono::milliseconds>(
+                    process_result.resourceUsage.userTimeUsage).count());
+                resource_usage.set_memory_usage_bytes(process_result.resourceUsage.memoryUsageBytes);
+            }
+            // TODO full: dump all results here
+        }
+        {
+            for (const receive_type &r: receive)
+            {
+                api::pb::result::TestResult::File &file = *result.add_files();
+                file.set_id(r.id);
+                file.set_data("TODO");
+                // TODO file.set_data()
+            }
+        }
         if (process_result)
         {
             // note: solution_files paths are relative to container's root
@@ -96,7 +153,26 @@ namespace bacs{namespace single
             const checker::result checker_result = m_checker.check(test_files, solution_files);
             // fill checker result
             api::pb::result::TestResult::Checking &checking = *result.mutable_checking();
-            // TODO
+            switch (checker_result.status)
+            {
+            case checker::result::OK:
+                checking.set_status(api::pb::result::TestResult::Checking::OK);
+                break;
+            case checker::result::WRONG_ANSWER:
+                checking.set_status(api::pb::result::TestResult::Checking::WRONG_ANSWER);
+                break;
+            case checker::result::PRESENTATION_ERROR:
+                checking.set_status(api::pb::result::TestResult::Checking::PRESENTATION_ERROR);
+                break;
+            case checker::result::FAIL_TEST:
+                checking.set_status(api::pb::result::TestResult::Checking::FAIL_TEST);
+                break;
+            }
+            // TODO change protobuffers to appropriate format
+            if (checker_result.message)
+                checking.set_output(checker_result.message.get());
+            else
+                checking.set_output("");
         }
     }
 }}
