@@ -24,18 +24,18 @@ namespace bacs{namespace single
     checker::checker(): pimpl(new impl)
     {
         ContainerConfig cfg = ContainerConfig::fromEnvironment();
-        if (!cfg.lxcConfig)
+        if (!cfg.lxcConfig.mount)
             cfg.lxcConfig.mount = yandex::contest::system::lxc::MountConfig();
         if (!cfg.lxcConfig.mount->entries)
             cfg.lxcConfig.mount->entries = std::vector<unistd::MountEntry>();
         cfg.lxcConfig.mount->entries->push_back(
-            unistd::MountEntry self_mount = unistd::MountEntry::bindRO(
+            unistd::MountEntry::bindRO(
                 boost::filesystem::current_path(),
                 checking_mount_path));
         filesystem::Directory checking_dir;
         checking_dir.path = checking_path;
         checking_dir.mode = 0555; // rx
-        cfg.filesystemConfig.createFiles.push_back(checking_dir);
+        cfg.filesystemConfig.createFiles.push_back(filesystem::CreateFile(checking_dir));
         pimpl->container = Container::create(cfg);
     }
 
