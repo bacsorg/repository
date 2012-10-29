@@ -20,14 +20,14 @@ namespace bacs{namespace single
     {
         m_intermediate.set_test_id(test_id);
         send_intermediate();
-        // TODO
+        // initialize container
         const ProcessGroupPointer process_group = m_container->createProcessGroup();
         const ProcessPointer process = m_solution->create(process_group, settings.execution().arguments());
         detail::process::setup(settings.resource_limits(), process_group, process);
         const boost::filesystem::path current_path = "/tmp/testing";
         const unistd::access::Id owner{1000, 1000};
         boost::filesystem::create_directories(m_container->filesystem().keepInRoot(current_path));
-        // Files
+        // files
         file_map test_files, solution_files;
         for (const std::string &data_id: m_tests.data_set())
         {
@@ -58,7 +58,7 @@ namespace bacs{namespace single
             if (file.has_receive())
                 receive.push_back({file.id(), path, file.receive()});
         }
-        // Execution
+        // execution
         process->setOwnerId(owner);
         // note: ignore current_path from settings.execution()
         process->setCurrentPath(current_path);
@@ -82,7 +82,7 @@ namespace bacs{namespace single
                 break;
             }
         }
-        // Execute
+        // execute
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         // fill result
@@ -174,5 +174,7 @@ namespace bacs{namespace single
             else
                 checking.set_output("");
         }
+        return result.execution().status() == api::pb::result::Execution::OK &&
+            result.checking().status() == api::pb::result::TestResult::Checking::OK;
     }
 }}
