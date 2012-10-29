@@ -1,0 +1,15 @@
+source
+{
+    import
+    {
+        source
+        {
+            . bacs/lib/pas
+        }
+    }
+    self
+    {
+        src src
+        modules modules
+    }
+}
