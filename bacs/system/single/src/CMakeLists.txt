@@ -59,6 +59,7 @@ add_executable(${PROJECT_NAME}
 
     src/lib/detail/process.cpp
     src/lib/detail/file.cpp
+    src/lib/detail/result.cpp
 
     src/lib/callbacks/xmlrpc.cpp
 )

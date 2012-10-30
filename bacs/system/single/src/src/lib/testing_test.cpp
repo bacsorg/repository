@@ -2,6 +2,7 @@
 #include "bacs/single/error.hpp"
 #include "bacs/single/detail/process.hpp"
 #include "bacs/single/detail/file.hpp"
+#include "bacs/single/detail/result.hpp"
 
 #include "bacs/single/api/pb/resource.pb.h"
 
@@ -87,55 +88,7 @@ namespace bacs{namespace single
         const Process::Result process_result = process->result();
         // fill result
         result.set_id(test_id);
-        {
-            api::pb::result::Execution &execution = *result.mutable_execution();
-            switch (process_group_result.completionStatus)
-            {
-            case ProcessGroup::Result::CompletionStatus::OK:
-            case ProcessGroup::Result::CompletionStatus::ABNORMAL_EXIT:
-                switch (process_result.completionStatus)
-                {
-                case Process::Result::CompletionStatus::OK:
-                    execution.set_status(api::pb::result::Execution::OK);
-                    break;
-                case Process::Result::CompletionStatus::ABNORMAL_EXIT:
-                    execution.set_status(api::pb::result::Execution::ABNORMAL_EXIT);
-                    break;
-                case Process::Result::CompletionStatus::MEMORY_LIMIT_EXCEEDED:
-                    execution.set_status(api::pb::result::Execution::MEMORY_LIMIT_EXCEEDED);
-                    break;
-                case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
-                    execution.set_status(api::pb::result::Execution::TIME_LIMIT_EXCEEDED);
-                    break;
-                case Process::Result::CompletionStatus::OUTPUT_LIMIT_EXCEEDED:
-                    execution.set_status(api::pb::result::Execution::OUTPUT_LIMIT_EXCEEDED);
-                    break;
-                case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
-                case Process::Result::CompletionStatus::START_FAILED:
-                case Process::Result::CompletionStatus::STOPPED:
-                    execution.set_status(api::pb::result::Execution::FAILED);
-                    break;
-                }
-                break;
-            case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
-                execution.set_status(api::pb::result::Execution::REAL_TIME_LIMIT_EXCEEDED);
-                break;
-            case ProcessGroup::Result::CompletionStatus::STOPPED:
-                execution.set_status(api::pb::result::Execution::FAILED);
-                break;
-            }
-            if (process_result.exitStatus)
-                execution.set_exit_status(process_result.exitStatus.get());
-            if (process_result.termSig)
-                execution.set_term_sig(process_result.termSig.get());
-            {
-                api::pb::ResourceUsage &resource_usage = *execution.mutable_resource_usage();
-                resource_usage.set_time_usage_millis(std::chrono::duration_cast<std::chrono::milliseconds>(
-                    process_result.resourceUsage.userTimeUsage).count());
-                resource_usage.set_memory_usage_bytes(process_result.resourceUsage.memoryUsageBytes);
-            }
-            // TODO full: dump all results here
-        }
+        detail::result::parse(process_group_result, process_result, *result.mutable_execution());
         {
             for (const receive_type &r: receive)
             {
