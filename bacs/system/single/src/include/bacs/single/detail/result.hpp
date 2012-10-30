@@ -7,7 +7,8 @@
 
 namespace bacs{namespace single{namespace detail{namespace result
 {
-    void parse(const yandex::contest::invoker::ProcessGroup::Result &process_group_result,
+    /// \return true if process has completed successfully
+    bool parse(const yandex::contest::invoker::ProcessGroup::Result &process_group_result,
                const yandex::contest::invoker::Process::Result &process_result,
                api::pb::result::Execution &result);
 }}}}

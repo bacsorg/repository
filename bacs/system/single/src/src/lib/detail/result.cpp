@@ -4,7 +4,7 @@ namespace bacs{namespace single{namespace detail{namespace result
 {
     using namespace yandex::contest::invoker;
 
-    void parse(const ProcessGroup::Result &process_group_result,
+    bool parse(const ProcessGroup::Result &process_group_result,
                const Process::Result &process_result,
                api::pb::result::Execution &result)
     {
@@ -54,5 +54,6 @@ namespace bacs{namespace single{namespace detail{namespace result
             resource_usage.set_memory_usage_bytes(process_result.resourceUsage.memoryUsageBytes);
         }
         // TODO full: dump all results here
+        return result.status() == api::pb::result::Execution::OK;
     }
 }}}}

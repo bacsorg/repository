@@ -88,7 +88,8 @@ namespace bacs{namespace single
         const Process::Result process_result = process->result();
         // fill result
         result.set_id(test_id);
-        detail::result::parse(process_group_result, process_result, *result.mutable_execution());
+        const bool execution_success = detail::result::parse(
+            process_group_result, process_result, *result.mutable_execution());
         {
             for (const receive_type &r: receive)
             {
@@ -98,7 +99,7 @@ namespace bacs{namespace single
                 // TODO file.set_data()
             }
         }
-        if (process_result)
+        if (execution_success)
         {
             // note: solution_files paths are relative to container's root
             for (file_map::value_type &data_id_path: solution_files)
