@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bacs/single/error.hpp"
+
 #include "bacs/single/api/pb/task.pb.h"
 #include "bacs/single/api/pb/result.pb.h"
 
@@ -48,7 +50,8 @@ namespace bacs{namespace single
         virtual ~builder() {}
 
         /// \return nullptr if on fail
-        virtual solution_ptr build(const std::string &source,
+        virtual solution_ptr build(const yandex::contest::invoker::ContainerPointer &container,
+                                   const std::string &source,
                                    const api::pb::ResourceLimits &resource_limits,
                                    api::pb::result::BuildResult &result)=0;
     BUNSAN_FACTORY_END(builder)

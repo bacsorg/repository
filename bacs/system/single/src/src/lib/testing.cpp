@@ -42,7 +42,8 @@ namespace bacs{namespace single
         m_intermediate.set_state(api::pb::intermediate::BUILDING);
         send_intermediate();
         m_builder = builder::instance(solution.build().builder());
-        m_solution = m_builder->build(solution.source(),
+        m_solution = m_builder->build(m_container,
+                                      solution.source(),
                                       solution.build().resource_limits(),
                                       *m_result.mutable_build());
         return static_cast<bool>(m_solution);
