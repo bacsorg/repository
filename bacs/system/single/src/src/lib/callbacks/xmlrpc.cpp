@@ -2,7 +2,7 @@
 
 namespace bacs{namespace single{namespace callback{namespace callbacks
 {
-    bool xmlrpc::factory_reg_hook = base::register_new("xmlrpc",
+    const bool xmlrpc::factory_reg_hook = base::register_new("xmlrpc",
         [](const std::vector<std::string> &arguments)
         {
             const base_ptr tmp(new xmlrpc(arguments));

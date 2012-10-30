@@ -22,6 +22,6 @@ namespace bacs{namespace single{namespace callback{namespace callbacks
         xmlrpc_c::paramList m_arguments;
 
     private:
-        static bool factory_reg_hook;
+        static const bool factory_reg_hook;
     };
 }}}}
