@@ -52,10 +52,10 @@ namespace bacs{namespace single{namespace builders
     }
 
     ProcessPointer fpc::create_process(const ProcessGroupPointer &process_group,
-                                       const boost::filesystem::path &source_name)
+                                       const name_type &name)
     {
         const ProcessPointer process = process_group->createProcess("fpc");
-        process->setArguments(process->executable(), m_flags, source_name, "-o", "executable");
+        process->setArguments(process->executable(), m_flags, name.source, "-o", name.executable);
         return process;
     }
 }}}

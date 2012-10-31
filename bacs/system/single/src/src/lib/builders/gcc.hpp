@@ -9,7 +9,7 @@ namespace bacs{namespace single{namespace builders
 
     protected:
         ProcessPointer create_process(const ProcessGroupPointer &process_group,
-                                      const boost::filesystem::path &source_name) override;
+                                      const name_type &name) override;
 
     private:
         std::vector<std::string> m_flags;

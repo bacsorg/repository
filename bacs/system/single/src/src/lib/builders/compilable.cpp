@@ -22,16 +22,17 @@ namespace bacs{namespace single{namespace builders
         bunsan::tempfile tmpdir = bunsan::tempfile::in_dir(solutions);
         BOOST_VERIFY(boost::filesystem::create_directory(tmpdir.path()));
         container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename(), owner_id);
-        const boost::filesystem::path source_name_ = source_name(source);
+        const name_type name_ = name(source);
         {
-            boost::filesystem::ofstream fout(tmpdir.path() / source_name_);
+            boost::filesystem::ofstream fout(tmpdir.path() / name_.source);
             fout.exceptions(std::ios::badbit);
             fout << source;
             fout.close();
         }
-        container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename() / source_name_, owner_id);
+        container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename() / name_.source, owner_id);
         const ProcessGroupPointer process_group = container->createProcessGroup();
-        const ProcessPointer process = create_process(process_group, source_name_);
+        boost::filesystem::path executable_name;
+        const ProcessPointer process = create_process(process_group, name_);
         detail::process::setup(resource_limits, process_group, process);
         process->setCurrentPath(solutions_path / tmpdir.path().filename());
         process->setOwnerId(owner_id);
@@ -50,19 +51,20 @@ namespace bacs{namespace single{namespace builders
             fin.close();
         }
         if (success)
-            return create_solution(container, std::move(tmpdir));
+            return create_solution(container, std::move(tmpdir), name_);
         else
             return solution_ptr();
     }
 
-    boost::filesystem::path compilable::source_name(const std::string &/*source*/)
+    compilable::name_type compilable::name(const std::string &/*source*/)
     {
-        return "source";
+        return {.source = "source", .executable = "executable"};
     }
 
     compilable_solution::compilable_solution(const ContainerPointer &container,
-                                             bunsan::tempfile &&tmpdir):
-        m_container(container), m_tmpdir(std::move(tmpdir)) {}
+                                             bunsan::tempfile &&tmpdir,
+                                             const compilable::name_type &name):
+        m_container(container), m_tmpdir(std::move(tmpdir)), m_name(name) {}
 
     ContainerPointer compilable_solution::container()
     {
@@ -72,5 +74,15 @@ namespace bacs{namespace single{namespace builders
     boost::filesystem::path compilable_solution::dir()
     {
         return solutions_path / m_tmpdir.path().filename();
+    }
+
+    boost::filesystem::path compilable_solution::source()
+    {
+        return dir() / m_name.source;
+    }
+
+    boost::filesystem::path compilable_solution::executable()
+    {
+        return dir() / m_name.executable;
     }
 }}}

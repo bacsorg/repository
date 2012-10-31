@@ -8,7 +8,8 @@ namespace bacs{namespace single{namespace builders
     {
     protected:
         solution_ptr create_solution(const ContainerPointer &container,
-                                     bunsan::tempfile &&tmpdir) override;
+                                     bunsan::tempfile &&tmpdir,
+                                     const name_type &name) override;
     };
 
     class native_compilable_solution: public compilable_solution
