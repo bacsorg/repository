@@ -15,6 +15,21 @@ namespace bacs{namespace single
     using namespace yandex::contest::invoker;
     namespace unistd = yandex::contest::system::unistd;
 
+    static const unistd::access::Id owner_id{1000, 1000};
+
+    bool testing::build(const api::pb::task::Solution &solution)
+    {
+        m_intermediate.set_state(api::pb::intermediate::BUILDING);
+        send_intermediate();
+        m_builder = builder::instance(solution.build().builder());
+        m_solution = m_builder->build(m_container,
+                                      owner_id,
+                                      solution.source(),
+                                      solution.build().resource_limits(),
+                                      *m_result.mutable_build());
+        return static_cast<bool>(m_solution);
+    }
+
     bool testing::test(const api::pb::settings::ProcessSettings &settings,
                        const std::string &test_id,
                        api::pb::result::TestResult &result)
@@ -26,7 +41,6 @@ namespace bacs{namespace single
         const ProcessPointer process = m_solution->create(process_group, settings.execution().arguments());
         detail::process::setup(settings.resource_limits(), process_group, process);
         const boost::filesystem::path current_path = "/tmp/testing";
-        const unistd::access::Id owner{1000, 1000};
         boost::filesystem::create_directories(m_container->filesystem().keepInRoot(current_path));
         // files
         file_map test_files, solution_files;
@@ -52,15 +66,15 @@ namespace bacs{namespace single
                 m_tests.copy(test_id, file.init(), path);
             else
                 detail::file::touch(path);
-            m_container->filesystem().setOwnerId(current_path, owner);
+            m_container->filesystem().setOwnerId(current_path, owner_id);
             m_container->filesystem().setMode(current_path, 0400);
-            m_container->filesystem().setOwnerId(location, owner);
+            m_container->filesystem().setOwnerId(location, owner_id);
             m_container->filesystem().setMode(location, detail::file::mode(file.permissions()) & 0700);
             if (file.has_receive())
                 receive.push_back({file.id(), path, file.receive()});
         }
         // execution
-        process->setOwnerId(owner);
+        process->setOwnerId(owner_id);
         // note: ignore current_path from settings.execution()
         process->setCurrentPath(current_path);
         // note: arguments is already set

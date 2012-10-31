@@ -37,18 +37,6 @@ namespace bacs{namespace single
         return true;
     }
 
-    bool testing::build(const api::pb::task::Solution &solution)
-    {
-        m_intermediate.set_state(api::pb::intermediate::BUILDING);
-        send_intermediate();
-        m_builder = builder::instance(solution.build().builder());
-        m_solution = m_builder->build(m_container,
-                                      solution.source(),
-                                      solution.build().resource_limits(),
-                                      *m_result.mutable_build());
-        return static_cast<bool>(m_solution);
-    }
-
     bool testing::test(const api::pb::testing::SolutionTesting &testing)
     {
         test(testing, *m_result.mutable_testing_result());

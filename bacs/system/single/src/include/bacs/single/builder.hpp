@@ -8,6 +8,7 @@
 #include "bunsan/factory_helper.hpp"
 
 #include "yandex/contest/invoker/Forward.hpp"
+#include "yandex/contest/system/unistd/access/Id.hpp"
 
 #include <boost/noncopyable.hpp>
 
@@ -51,6 +52,7 @@ namespace bacs{namespace single
 
         /// \return nullptr if on fail
         virtual solution_ptr build(const yandex::contest::invoker::ContainerPointer &container,
+                                   const yandex::contest::system::unistd::access::Id &owner_id,
                                    const std::string &source,
                                    const api::pb::ResourceLimits &resource_limits,
                                    api::pb::result::BuildResult &result)=0;
