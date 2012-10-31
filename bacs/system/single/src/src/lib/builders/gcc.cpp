@@ -26,7 +26,7 @@ namespace bacs{namespace single{namespace builders
             }
             else if (boost::regex_match(arg, match, key_value))
             {
-                BOOST_ASSERT(match.size() == 2);
+                BOOST_ASSERT(match.size() == 3);
                 const std::string key = match[1].str(), value = match[2].str();
                 if (key == "optimize")
                 {
