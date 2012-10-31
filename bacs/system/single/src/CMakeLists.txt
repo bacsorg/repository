@@ -66,6 +66,7 @@ add_executable(${PROJECT_NAME}
     src/lib/builders/compilable.cpp
     src/lib/builders/native_compilable.cpp
     src/lib/builders/gcc.cpp
+    src/lib/builders/fpc.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${libraries})
 
