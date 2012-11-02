@@ -69,6 +69,7 @@ add_executable(${PROJECT_NAME}
     src/lib/builders/fpc.cpp
     src/lib/builders/interpretable.cpp
     src/lib/builders/python.cpp
+    src/lib/builders/java.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${libraries})
 
