@@ -9,6 +9,7 @@
 #include "yandex/contest/invoker/All.hpp"
 
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/fstream.hpp>
 
 namespace bacs{namespace single
 {
@@ -60,7 +61,8 @@ namespace bacs{namespace single
             if (solution_files.find(file.id()) != solution_files.end())
                 BOOST_THROW_EXCEPTION(error() << error::message("Duplicate file ids."));
             const boost::filesystem::path location = solution_files[file.id()] =
-                "/" / current_path / detail::file::to_path(file.path()).filename(); // note: strip to filename
+                "/" / current_path / (file.has_path() ?
+                    detail::file::to_path(file.path()).filename() /* note: strip to filename */ : boost::filesystem::unique_path());
             const boost::filesystem::path path = m_container->filesystem().keepInRoot(location);
             if (file.has_init())
                 m_tests.copy(test_id, file.init(), path);
@@ -104,14 +106,24 @@ namespace bacs{namespace single
         result.set_id(test_id);
         const bool execution_success = detail::result::parse(
             process_group_result, process_result, *result.mutable_execution());
+        for (const receive_type &r: receive)
         {
-            for (const receive_type &r: receive)
+            BOOST_ASSERT(boost::filesystem::exists(r.path));
+            api::pb::result::TestResult::File &file = *result.add_files();
+            file.set_id(r.id);
+            std::string &data = *file.mutable_data();
+            boost::filesystem::fstream fin(r.path, std::ios::binary);
+            fin.exceptions(std::ios::badbit);
+            switch (r.range.whence())
             {
-                api::pb::result::TestResult::File &file = *result.add_files();
-                file.set_id(r.id);
-                file.set_data("TODO");
-                // TODO file.set_data()
+            case api::pb::settings::File::Range::BEGIN:
+                fin.seekg(r.range.offset(), std::ios::beg);
+                break;
+            case api::pb::settings::File::Range::END:
+                fin.seekg(r.range.offset(), std::ios::end);
+                break;
             }
+            data = "TODO";
         }
         if (execution_success)
         {
