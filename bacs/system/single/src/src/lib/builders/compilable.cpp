@@ -31,7 +31,6 @@ namespace bacs{namespace single{namespace builders
         }
         container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename() / name_.source, owner_id);
         const ProcessGroupPointer process_group = container->createProcessGroup();
-        boost::filesystem::path executable_name;
         const ProcessPointer process = create_process(process_group, name_);
         detail::process::setup(resource_limits, process_group, process);
         process->setCurrentPath(solutions_path / tmpdir.path().filename());
