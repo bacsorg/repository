@@ -6,6 +6,8 @@
 
 #include "bacs/single/api/pb/resource.pb.h"
 
+#include "bunsan/tempfile.hpp"
+
 #include "yandex/contest/invoker/All.hpp"
 
 #include <boost/filesystem/operations.hpp>
@@ -31,18 +33,27 @@ namespace bacs{namespace single
         return static_cast<bool>(m_solution);
     }
 
+    static const boost::filesystem::path testing_path = "/tmp/testing";
+
     bool testing::test(const api::pb::settings::ProcessSettings &settings,
                        const std::string &test_id,
                        api::pb::result::TestResult &result)
     {
         m_intermediate.set_test_id(test_id);
         send_intermediate();
-        // initialize container
+        // preinitialization
+        const boost::filesystem::path container_testing_path = m_container->filesystem().keepInRoot(testing_path);
+        boost::filesystem::create_directories(container_testing_path);
+        // initialize working directory
+        const bunsan::tempfile tmpdir = bunsan::tempfile::in_dir(container_testing_path);
+        BOOST_VERIFY(boost::filesystem::create_directory(tmpdir.path()));
+        const boost::filesystem::path current_path = testing_path / tmpdir.path().filename();
+        m_container->filesystem().setOwnerId(current_path, owner_id);
+        m_container->filesystem().setMode(current_path, 0500);
+        // initialize process
         const ProcessGroupPointer process_group = m_container->createProcessGroup();
         const ProcessPointer process = m_solution->create(process_group, settings.execution().arguments());
         detail::process::setup(settings.resource_limits(), process_group, process);
-        const boost::filesystem::path current_path = "/tmp/testing";
-        boost::filesystem::create_directories(m_container->filesystem().keepInRoot(current_path));
         // files
         file_map test_files, solution_files;
         for (const std::string &data_id: m_tests.data_set())
@@ -68,8 +79,6 @@ namespace bacs{namespace single
                 m_tests.copy(test_id, file.init(), path);
             else
                 detail::file::touch(path);
-            m_container->filesystem().setOwnerId(current_path, owner_id);
-            m_container->filesystem().setMode(current_path, 0400);
             m_container->filesystem().setOwnerId(location, owner_id);
             m_container->filesystem().setMode(location, detail::file::mode(file.permissions()) & 0700);
             if (file.has_receive())
