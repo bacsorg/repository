@@ -114,7 +114,7 @@ namespace bacs{namespace single
                 const boost::regex m_regex;
             };
 
-            class any: public impl, public std::vector<std::unique_ptr<impl>>
+            class any_of: public impl, public std::vector<std::unique_ptr<impl>>
             {
             public:
                 bool match(const std::string &test_id) const override
@@ -130,7 +130,7 @@ namespace bacs{namespace single
             static std::unique_ptr<impl> impl_(
                 const google::protobuf::RepeatedPtrField<api::pb::testing::TestQuery> &test_query)
             {
-                std::unique_ptr<any> tmp;
+                std::unique_ptr<any_of> tmp(new any_of);
                 for (const api::pb::testing::TestQuery &query: test_query)
                     tmp->push_back(impl_(query));
                 return std::move(tmp);
