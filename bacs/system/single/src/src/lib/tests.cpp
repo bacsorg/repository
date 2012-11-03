@@ -58,7 +58,10 @@ namespace bacs{namespace single
 
                 bool match(const std::string &test_id) const override
                 {
-                    return ::fnmatch(m_wildcard.c_str(), test_id.c_str(), m_flags);
+                    const int m = ::fnmatch(m_wildcard.c_str(), test_id.c_str(), m_flags);
+                    if (m && m != FNM_NOMATCH)
+                        BOOST_THROW_EXCEPTION(error() << error::message("fnmatch() has failed"));
+                    return !m;
                 }
 
             private:
