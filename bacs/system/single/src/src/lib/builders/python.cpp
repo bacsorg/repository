@@ -12,7 +12,7 @@ namespace bacs{namespace single{namespace builders
             return tmp;
         });
 
-    static const boost::regex positional("^[^=]+$"), key_value("^([^=]+)=(.*)$");
+    static const boost::regex positional("[^=]+"), key_value("([^=]+)=(.*)");
 
     python::python(const std::vector<std::string> &arguments)
     {

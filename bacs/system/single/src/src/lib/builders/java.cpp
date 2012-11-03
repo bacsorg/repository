@@ -13,8 +13,8 @@ namespace bacs{namespace single{namespace builders
             return tmp;
         });
 
-    static const boost::regex positional("^[^=]+$"), key_value("^([^=]+)=(.*)$");
-    static const boost::regex filename_error(".*class (\\S+) is public, should be declared in a file named \\1.java");
+    static const boost::regex positional("[^=]+"), key_value("([^=]+)=(.*)");
+    static const boost::regex filename_error(".*class (\\S+) is public, should be declared in a file named \\1.java.*");
 
     java::java(const std::vector<std::string> &arguments, bool parse_name)
     {
