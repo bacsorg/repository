@@ -67,6 +67,7 @@ namespace bacs{namespace single
                        api::pb::result::TestGroupResult &result)
     {
         m_intermediate.set_test_group_id(test_group.id());
+        result.set_id(test_group.id());
         const api::pb::settings::TestGroupSettings &settings = test_group.settings();
         const std::unordered_set<std::string> test_set = m_tests.test_set(test_group.test_set());
         std::vector<std::string> test_order(test_set.begin(), test_set.end());
