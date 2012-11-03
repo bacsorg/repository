@@ -132,7 +132,13 @@ namespace bacs{namespace single
                 fin.seekg(r.range.offset(), std::ios::end);
                 break;
             }
-            data = "TODO";
+            char buf[4096];
+            while (fin && data.size() < r.range.size())
+            {
+                fin.read(buf, std::min(sizeof(buf), r.range.size() - data.size()));
+                data.insert(data.end(), buf, buf + fin.gcount());
+            }
+            fin.close();
         }
         if (execution_success)
         {
