@@ -1,5 +1,11 @@
 #include "bacs/single/detail/result.hpp"
 
+#include "yandex/contest/config/OutputArchive.hpp"
+
+#include <sstream>
+
+#include <boost/property_tree/json_parser.hpp>
+
 namespace bacs{namespace single{namespace detail{namespace result
 {
     using namespace yandex::contest::invoker;
@@ -53,7 +59,20 @@ namespace bacs{namespace single{namespace detail{namespace result
                 process_result.resourceUsage.userTimeUsage).count());
             resource_usage.set_memory_usage_bytes(process_result.resourceUsage.memoryUsageBytes);
         }
-        // TODO full: dump all results here
+        // full: dump all results here
+        {
+            boost::property_tree::ptree ptree, process_group_result_tree, process_result_tree;
+            yandex::contest::config::OutputArchive<boost::property_tree::ptree>
+                process_group_result_oa(process_group_result_tree),
+                process_result_oa(process_result_tree);
+            process_group_result_oa << process_group_result;
+            process_result_oa << process_result;
+            ptree.put_child("processGroupResult", process_group_result_tree);
+            ptree.put_child("processResult", process_result_tree);
+            std::ostringstream buf;
+            boost::property_tree::write_json(buf, ptree);
+            result.set_full(buf.str());
+        }
         return result.status() == api::pb::result::Execution::OK;
     }
 }}}}
