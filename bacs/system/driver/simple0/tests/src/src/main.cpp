@@ -1,5 +1,6 @@
 #include "bunsan/config.hpp"
-#include "bunsan/system_error.hpp"
+#include "bunsan/enable_error_info.hpp"
+#include "bunsan/filesystem/fstream.hpp"
 
 #include "yandex/contest/StreamEnum.hpp"
 
@@ -7,12 +8,11 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/assert.hpp>
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
-#include "yandex/contest/serialization/unordered_set.hpp"
+#include "bunsan/serialization/unordered_set.hpp"
 
 namespace
 {
@@ -38,84 +38,82 @@ namespace
 
     eoln transform(const boost::filesystem::path &src, const boost::filesystem::path &dst)
     {
-        boost::filesystem::ifstream fin(src, std::ios_base::binary);
-        if (!fin.is_open())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("open file: \"" + src.string() + "\""));
-        boost::filesystem::ofstream fout(dst, std::ios_base::binary);
-        if (!fout.is_open())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("open file: \"" + dst.string() + "\""));
-        eoln state = NA;
-        char c, p;
-        while (fin.get(c) && fout)
+        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
         {
-            bool ord = is_ordinary(c);
-            switch (state)
+            bunsan::filesystem::ifstream fin(src, std::ios_base::binary);
+            bunsan::filesystem::ofstream fout(dst, std::ios_base::binary);
+            eoln state = NA;
+            char c, p;
+            while (fin.get(c) && fout)
             {
-            case CR_:
-                if (ord || c == '\r')
+                bool ord = is_ordinary(c);
+                switch (state)
                 {
-                    state = CR;
-                    fout.put('\n');
-                    if (c == '\r')
+                case CR_:
+                    if (ord || c == '\r')
+                    {
+                        state = CR;
+                        fout.put('\n');
+                        if (c == '\r')
+                            fout.put('\n');
+                        else
+                            fout.put(c);
+                    }
+                    else
+                    {
+                        BOOST_ASSERT(c == '\n');
+                        state = CRLF;
+                        fout.put('\n');
+                    }
+                    break;
+                case CR:
+                    if (ord)
+                        fout.put(c);
+                    else if (c == '\r')
                         fout.put('\n');
                     else
+                        BOOST_THROW_EXCEPTION(not_cr_eoln_in_cr_file());
+                    break;
+                case LF:
+                    if (ord || c == '\n')
                         fout.put(c);
-                }
-                else
-                {
-                    BOOST_ASSERT(c == '\n');
-                    state = CRLF;
-                    fout.put('\n');
-                }
-                break;
-            case CR:
-                if (ord)
-                    fout.put(c);
-                else if (c == '\r')
-                    fout.put('\n');
-                else
-                    BOOST_THROW_EXCEPTION(not_cr_eoln_in_cr_file());
-                break;
-            case LF:
-                if (ord || c == '\n')
-                    fout.put(c);
-                else
-                    BOOST_THROW_EXCEPTION(not_lf_eoln_in_lf_file());
-                break;
-            case CRLF:
-                if (ord)
-                    fout.put(c);
-                else if (c == '\n')
-                {
-                    if (p != '\r')
-                        BOOST_THROW_EXCEPTION(not_crlf_eoln_in_crlf_file());
-                    fout.put('\n');
-                }
-                // we will skip \r
-                break;
-            case NA:
-                if (ord)
-                    fout.put(c);
-                else
-                    switch (c)
+                    else
+                        BOOST_THROW_EXCEPTION(not_lf_eoln_in_lf_file());
+                    break;
+                case CRLF:
+                    if (ord)
+                        fout.put(c);
+                    else if (c == '\n')
                     {
-                    case '\r':
-                        state = CR_;
-                        break;
-                    case '\n':
-                        state = LF;
+                        if (p != '\r')
+                            BOOST_THROW_EXCEPTION(not_crlf_eoln_in_crlf_file());
                         fout.put('\n');
-                        break;
                     }
-                break;
+                    // we will skip \r
+                    break;
+                case NA:
+                    if (ord)
+                        fout.put(c);
+                    else
+                        switch (c)
+                        {
+                        case '\r':
+                            state = CR_;
+                            break;
+                        case '\n':
+                            state = LF;
+                            fout.put('\n');
+                            break;
+                        }
+                    break;
+                }
+                p = c;
             }
-            p = c;
+            fin.close();
+            fout.close();
+            return state;
         }
-        if (fin.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("reading from file: \"" + src.string() + "\""));
-        if (fout.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("writing to file: \"" + dst.string() + "\""));
-        return state;
+        BUNSAN_EXCEPTIONS_WRAP_END()
     }
 }
 
@@ -123,32 +121,26 @@ int main(int argc, char *argv[])
 {
     BOOST_ASSERT(argc >= 2 + 1);
     std::unordered_set<std::string> test_set, data_set, text_data_set;
+    BUNSAN_EXCEPTIONS_WRAP_BEGIN()
     {
-        boost::filesystem::ifstream fin("etc/tests");
-        if (fin.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("open"));
+        bunsan::filesystem::ifstream fin("etc/tests");
         {
             boost::archive::text_iarchive ia(fin);
             ia >> test_set >> data_set >> text_data_set;
         }
-        if (fin.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("read"));
-        if (fin.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("close"));
+        fin.close();
     }
+    BUNSAN_EXCEPTIONS_WRAP_END()
+    BUNSAN_EXCEPTIONS_WRAP_BEGIN()
     {
-        boost::filesystem::ofstream fout(argv[1]);
-        if (fout.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("open"));
+        bunsan::filesystem::ofstream fout(argv[1]);
         {
             boost::archive::text_oarchive oa(fout);
             oa << test_set << data_set;
         }
-        if (fout.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("write"));
-        if (fout.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("close"));
+        fout.close();
     }
+    BUNSAN_EXCEPTIONS_WRAP_END()
     const boost::filesystem::path dst_dir = argv[2];
     for (int i = 3; i < argc; ++i)
     {

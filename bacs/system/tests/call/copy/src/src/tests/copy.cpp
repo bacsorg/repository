@@ -3,8 +3,10 @@
 
 #include "bacs/single/tests.hpp"
 
+#include "bunsan/enable_error_info.hpp"
+#include "bunsan/filesystem/fstream.hpp"
+
 #include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
 
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/string.hpp>
@@ -23,17 +25,16 @@ namespace bacs{namespace single
     {
         try
         {
-            boost::filesystem::ifstream fin("etc/tests");
-            if (fin.bad())
-                BOOST_THROW_EXCEPTION(bunsan::system_error("open"));
+            BUNSAN_EXCEPTIONS_WRAP_BEGIN()
             {
-                boost::archive::text_iarchive ia(fin);
-                ia >> pimpl->test_set >> pimpl->data_set;
+                bunsan::filesystem::ifstream fin("etc/tests");
+                {
+                    boost::archive::text_iarchive ia(fin);
+                    ia >> pimpl->test_set >> pimpl->data_set;
+                }
+                fin.close();
             }
-            if (fin.bad())
-                BOOST_THROW_EXCEPTION(bunsan::system_error("read"));
-            if (fin.bad())
-                BOOST_THROW_EXCEPTION(bunsan::system_error("close"));
+            BUNSAN_EXCEPTIONS_WRAP_END()
         }
         catch (...)
         {

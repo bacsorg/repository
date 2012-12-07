@@ -6,12 +6,13 @@
 
 #include "bacs/single/api/pb/resource.pb.h"
 
+#include "bunsan/enable_error_info.hpp"
+#include "bunsan/filesystem/fstream.hpp"
 #include "bunsan/tempfile.hpp"
 
 #include "yandex/contest/invoker/All.hpp"
 
 #include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
 
 namespace bacs{namespace single
 {
@@ -121,24 +122,27 @@ namespace bacs{namespace single
             api::pb::result::TestResult::File &file = *result.add_files();
             file.set_id(r.id);
             std::string &data = *file.mutable_data();
-            boost::filesystem::fstream fin(r.path, std::ios::binary);
-            fin.exceptions(std::ios::badbit);
-            switch (r.range.whence())
+            BUNSAN_EXCEPTIONS_WRAP_BEGIN()
             {
-            case api::pb::settings::File::Range::BEGIN:
-                fin.seekg(r.range.offset(), std::ios::beg);
-                break;
-            case api::pb::settings::File::Range::END:
-                fin.seekg(r.range.offset(), std::ios::end);
-                break;
+                bunsan::filesystem::fstream fin(r.path, std::ios::binary);
+                switch (r.range.whence())
+                {
+                case api::pb::settings::File::Range::BEGIN:
+                    fin.seekg(r.range.offset(), std::ios::beg);
+                    break;
+                case api::pb::settings::File::Range::END:
+                    fin.seekg(r.range.offset(), std::ios::end);
+                    break;
+                }
+                char buf[4096];
+                while (fin && data.size() < r.range.size())
+                {
+                    fin.read(buf, std::min(sizeof(buf), r.range.size() - data.size()));
+                    data.insert(data.end(), buf, buf + fin.gcount());
+                }
+                fin.close();
             }
-            char buf[4096];
-            while (fin && data.size() < r.range.size())
-            {
-                fin.read(buf, std::min(sizeof(buf), r.range.size() - data.size()));
-                data.insert(data.end(), buf, buf + fin.gcount());
-            }
-            fin.close();
+            BUNSAN_EXCEPTIONS_WRAP_END()
         }
         if (execution_success)
         {

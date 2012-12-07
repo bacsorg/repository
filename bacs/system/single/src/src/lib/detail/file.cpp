@@ -1,10 +1,9 @@
 #include "bacs/single/detail/file.hpp"
 
-#include "bunsan/system_error.hpp"
+#include "bunsan/enable_error_info.hpp"
+#include "bunsan/filesystem/fstream.hpp"
 
 #include <algorithm>
-
-#include <boost/filesystem/fstream.hpp>
 
 namespace bacs{namespace single{namespace detail{namespace file
 {
@@ -20,12 +19,12 @@ namespace bacs{namespace single{namespace detail{namespace file
 
     void touch(const boost::filesystem::path &path)
     {
-        boost::filesystem::ofstream fout(path);
-        if (fout.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("open"));
-        fout.close();
-        if (fout.bad())
-            BOOST_THROW_EXCEPTION(bunsan::system_error("close"));
+        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+        {
+            bunsan::filesystem::ofstream fout(path);
+            fout.close();
+        }
+        BUNSAN_EXCEPTIONS_WRAP_END()
     }
 
     mode_t mode(const api::pb::settings::File::Permissions &value)

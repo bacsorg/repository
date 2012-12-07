@@ -3,8 +3,10 @@
 #include "bacs/single/detail/process.hpp"
 #include "bacs/single/detail/result.hpp"
 
+#include "bunsan/enable_error_info.hpp"
+#include "bunsan/filesystem/fstream.hpp"
+
 #include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/assert.hpp>
 
 namespace bacs{namespace single{namespace builders
@@ -23,12 +25,13 @@ namespace bacs{namespace single{namespace builders
         BOOST_VERIFY(boost::filesystem::create_directory(tmpdir.path()));
         container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename(), owner_id);
         const name_type name_ = name(source);
+        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
         {
-            boost::filesystem::ofstream fout(tmpdir.path() / name_.source);
-            fout.exceptions(std::ios::badbit);
+            bunsan::filesystem::ofstream fout(tmpdir.path() / name_.source);
             fout << source;
             fout.close();
         }
+        BUNSAN_EXCEPTIONS_WRAP_END()
         container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename() / name_.source, owner_id);
         const ProcessGroupPointer process_group = container->createProcessGroup();
         const ProcessPointer process = create_process(process_group, name_);
@@ -40,15 +43,16 @@ namespace bacs{namespace single{namespace builders
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         const bool success = detail::result::parse(process_group_result, process_result, *result.mutable_execution());
+        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
         {
-            boost::filesystem::ifstream fin(tmpdir.path() / "log");
-            fin.exceptions(std::ios::badbit);
+            bunsan::filesystem::ifstream fin(tmpdir.path() / "log");
             std::string &output = *result.mutable_output();
             char buf[4096];
             fin.read(buf, sizeof(buf));
             output.assign(buf,fin.gcount());
             fin.close();
         }
+        BUNSAN_EXCEPTIONS_WRAP_END()
         if (success)
             return create_solution(container, std::move(tmpdir), name_);
         else
