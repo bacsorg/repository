@@ -1,10 +1,17 @@
 #include "gcc.hpp"
 
+#include <unordered_map>
+
 #include <boost/regex.hpp>
 #include <boost/assert.hpp>
 
 namespace bacs{namespace single{namespace builders
 {
+    namespace
+    {
+        struct invalid_lang_error: virtual invalid_argument_error {};
+    }
+
     const bool gcc::factory_reg_hook = builder::register_new("gcc",
         [](const std::vector<std::string> &arguments)
         {
@@ -14,7 +21,8 @@ namespace bacs{namespace single{namespace builders
 
     static const boost::regex positional("[^=]+"), key_value("([^=]+)=(.*)");
 
-    gcc::gcc(const std::vector<std::string> &arguments)
+    gcc::gcc(const std::vector<std::string> &arguments):
+        m_executable("gcc")
     {
         for (const std::string &arg: arguments)
         {
@@ -34,6 +42,19 @@ namespace bacs{namespace single{namespace builders
                 }
                 else if (key == "lang")
                 {
+                    static const std::unordered_map<std::string, std::string> langs = {
+                        {"c", "gcc"},
+                        {"c++", "g++"},
+                        {"objective-c", "gcc"}, // TODO unchecked
+                        {"objective-c++", "g++"}, // TODO unchecked
+                        {"f77", "gfortran"},
+                        {"f95", "gfortran"},
+                        {"go", "gccgo"}
+                    };
+                    const auto iter = langs.find(value);
+                    if (iter == langs.end())
+                        BOOST_THROW_EXCEPTION(invalid_lang_error() << invalid_lang_error::argument(value));
+                    m_executable = iter->second;
                     m_flags.push_back("-x");
                     m_flags.push_back(value);
                 }
@@ -58,7 +79,7 @@ namespace bacs{namespace single{namespace builders
     ProcessPointer gcc::create_process(const ProcessGroupPointer &process_group,
                                        const name_type &name)
     {
-        const ProcessPointer process = process_group->createProcess("gcc");
+        const ProcessPointer process = process_group->createProcess(m_executable);
         process->setArguments(process->executable(), m_flags, name.source, "-o", name.executable);
         return process;
     }

@@ -12,6 +12,7 @@ namespace bacs{namespace single{namespace builders
                                       const name_type &name) override;
 
     private:
+        std::string m_executable;
         std::vector<std::string> m_flags;
 
     private:
