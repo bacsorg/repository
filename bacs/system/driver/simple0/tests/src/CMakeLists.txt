@@ -6,32 +6,15 @@ cmake_minimum_required(VERSION 2.8)
 
 include(YandexContestCommon)
 
-# BOOST
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options thread REQUIRED)
-list(APPEND includes ${Boost_INCLUDE_DIRS})
-list(APPEND libraries ${Boost_LIBRARIES})
+bunsan_use_boost(system filesystem serialization iostreams unit_test_framework program_options thread)
+bunsan_use_bunsan(common)
+bunsan_use(yandex_contest_common)
 
-# bunsan
-list(APPEND libraries bunsan_common)
-
-# yandex_contest
-list(APPEND libraries yandex_contest_common)
-
-# Includes and libraries
-include_directories(${includes})
-
-# Targets
-
-# Converter
-add_executable(${PROJECT_NAME}
+bunsan_add_executable(${PROJECT_NAME}
     src/main.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${libraries})
 
 # Tests
-
 set(tests_src_dir ${PROJECT_SOURCE_DIR}/share/tests)
 
 file(GLOB tests_src ${tests_src_dir}/*)
