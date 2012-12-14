@@ -34,8 +34,7 @@ namespace bacs{namespace single{namespace builders
                 }
                 else if (key == "lang")
                 {
-                    m_flags.push_back("-x");
-                    m_flags.push_back(value);
+                    m_flags.push_back("-M" + value);
                 }
                 else
                 {
