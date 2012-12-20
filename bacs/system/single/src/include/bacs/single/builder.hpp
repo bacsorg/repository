@@ -50,7 +50,7 @@ namespace bacs{namespace single
     public:
         virtual ~builder() {}
 
-        /// \return nullptr if on fail
+        /// \return nullptr on fail
         virtual solution_ptr build(const yandex::contest::invoker::ContainerPointer &container,
                                    const yandex::contest::system::unistd::access::Id &owner_id,
                                    const std::string &source,
