@@ -1,6 +1,6 @@
 #include "bacs/single/detail/result.hpp"
 
-#include "yandex/contest/config/OutputArchive.hpp"
+#include "bunsan/config/cast.hpp"
 
 #include <sstream>
 
@@ -61,14 +61,9 @@ namespace bacs{namespace single{namespace detail{namespace result
         }
         // full: dump all results here
         {
-            boost::property_tree::ptree ptree, process_group_result_tree, process_result_tree;
-            yandex::contest::config::OutputArchive<boost::property_tree::ptree>
-                process_group_result_oa(process_group_result_tree),
-                process_result_oa(process_result_tree);
-            process_group_result_oa << process_group_result;
-            process_result_oa << process_result;
-            ptree.put_child("processGroupResult", process_group_result_tree);
-            ptree.put_child("processResult", process_result_tree);
+            boost::property_tree::ptree ptree;
+            ptree.put_child("processGroupResult", bunsan::config::save<boost::property_tree::ptree>(process_group_result));
+            ptree.put_child("processResult", bunsan::config::save<boost::property_tree::ptree>(process_result));
             std::ostringstream buf;
             boost::property_tree::write_json(buf, ptree);
             result.set_full(buf.str());
