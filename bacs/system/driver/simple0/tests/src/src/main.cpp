@@ -1,8 +1,7 @@
 #include "bunsan/config.hpp"
 #include "bunsan/enable_error_info.hpp"
+#include "bunsan/stream_enum.hpp"
 #include "bunsan/filesystem/fstream.hpp"
-
-#include "yandex/contest/StreamEnum.hpp"
 
 #include <unordered_set>
 
@@ -22,7 +21,7 @@ namespace
     struct not_crlf_eoln_in_crlf_file: virtual newline_error {};
 
 
-    YANDEX_CONTEST_STREAM_ENUM(eoln,
+    BUNSAN_STREAM_ENUM(eoln,
     (
         CR_,  ///< CR, may be CRLF
         CR,   ///< definitely CR
