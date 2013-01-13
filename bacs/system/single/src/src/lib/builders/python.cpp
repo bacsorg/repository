@@ -69,10 +69,9 @@ if __name__=='__main__':
                                          bunsan::tempfile &&tmpdir,
                                          const name_type &name)
     {
-        std::vector<std::string> flags(m_flags);
-        flags.push_back(name.source.string());
+        BOOST_ASSERT(m_flags.empty());
         const solution_ptr tmp(new interpretable_solution(
-            container, std::move(tmpdir), name, "python" + m_lang, flags));
+            container, std::move(tmpdir), name, "python" + m_lang));
         return tmp;
     }
 }}}

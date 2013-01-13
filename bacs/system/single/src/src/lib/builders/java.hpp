@@ -2,6 +2,8 @@
 
 #include "interpretable.hpp"
 
+#include "bunsan/forward_constructor.hpp"
+
 #include <memory>
 
 namespace bacs{namespace single{namespace builders
@@ -35,5 +37,14 @@ namespace bacs{namespace single{namespace builders
 
     private:
         static const bool factory_reg_hook;
+    };
+
+    class java_solution: public interpretable_solution
+    {
+    public:
+        BUNSAN_INHERIT_CONSTRUCTOR(java_solution, interpretable_solution)
+
+    protected:
+        std::vector<std::string> arguments() const override;
     };
 }}}

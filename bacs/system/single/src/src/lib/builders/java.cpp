@@ -101,10 +101,17 @@ namespace bacs{namespace single{namespace builders
                                        bunsan::tempfile &&tmpdir,
                                        const name_type &name)
     {
-        std::vector<std::string> flags(m_flags);
-        flags.push_back(name.executable.string());
-        solution_ptr tmp(new interpretable_solution(
-            container, std::move(tmpdir), name, "java", flags));
+        solution_ptr tmp(new java_solution(
+            container, std::move(tmpdir), name, "java", m_flags));
         return tmp;
+    }
+
+    std::vector<std::string> java_solution::arguments() const
+    {
+        std::vector<std::string> arguments_ = flags();
+        arguments_.push_back("-classpath");
+        arguments_.push_back(dir().string());
+        arguments_.push_back(name().executable.string());
+        return arguments_;
     }
 }}}
