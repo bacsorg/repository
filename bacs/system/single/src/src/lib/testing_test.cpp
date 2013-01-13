@@ -124,7 +124,7 @@ namespace bacs{namespace single
             std::string &data = *file.mutable_data();
             BUNSAN_EXCEPTIONS_WRAP_BEGIN()
             {
-                bunsan::filesystem::fstream fin(r.path, std::ios::binary);
+                bunsan::filesystem::ifstream fin(r.path, std::ios::binary);
                 switch (r.range.whence())
                 {
                 case api::pb::settings::File::Range::BEGIN:
