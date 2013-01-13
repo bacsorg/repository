@@ -74,17 +74,22 @@ namespace bacs{namespace single{namespace builders
         return m_container;
     }
 
-    boost::filesystem::path compilable_solution::dir()
+    const compilable::name_type &compilable_solution::name() const
+    {
+        return m_name;
+    }
+
+    boost::filesystem::path compilable_solution::dir() const
     {
         return solutions_path / m_tmpdir.path().filename();
     }
 
-    boost::filesystem::path compilable_solution::source()
+    boost::filesystem::path compilable_solution::source() const
     {
         return dir() / m_name.source;
     }
 
-    boost::filesystem::path compilable_solution::executable()
+    boost::filesystem::path compilable_solution::executable() const
     {
         return dir() / m_name.executable;
     }

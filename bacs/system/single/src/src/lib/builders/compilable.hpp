@@ -46,9 +46,10 @@ namespace bacs{namespace single{namespace builders
 
     protected:
         ContainerPointer container();
-        boost::filesystem::path dir();
-        boost::filesystem::path source();
-        boost::filesystem::path executable();
+        const compilable::name_type &name() const;
+        boost::filesystem::path dir() const;
+        boost::filesystem::path source() const;
+        boost::filesystem::path executable() const;
 
     private:
         const ContainerPointer m_container;
