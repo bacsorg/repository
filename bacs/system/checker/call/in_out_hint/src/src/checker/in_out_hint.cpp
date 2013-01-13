@@ -14,6 +14,7 @@ namespace bacs{namespace single
 
     const boost::filesystem::path checking_path = "/tmp/checking";
     const boost::filesystem::path checking_mount_path = checking_path / "package";
+    const boost::filesystem::path checking_log = checking_path / "log";
 
     class checker::impl
     {
@@ -59,7 +60,7 @@ namespace bacs{namespace single
         process->setArguments(process->executable(), "in", "out", "hint");
         process->setCurrentPath(checking_path);
         process->setStream(2, FDAlias(1));
-        process->setStream(1, File(checking_path / "log"));
+        process->setStream(1, File(checking_log, AccessMode::WRITE_ONLY));
         // TODO process->setResourceLimits()
         // execute
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
