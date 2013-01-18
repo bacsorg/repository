@@ -1,4 +1,4 @@
-project(bunsan_bacs_system_driver_simple0_tests)
+project(bunsan_bacs_system_driver_simple0_tests_builder)
 
 include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
@@ -13,32 +13,5 @@ bunsan_add_executable(${PROJECT_NAME}
     src/main.cpp
 )
 
-# Tests
-set(tests_src_dir ${PROJECT_SOURCE_DIR}/share/tests)
-
-file(GLOB tests_src ${tests_src_dir}/*)
-
-set(tests_dst_dir ${PROJECT_BINARY_DIR}/tests_dir)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${tests_dst_dir})
-set(tests_info_src ${PROJECT_SOURCE_DIR}/etc/tests)
-set(tests_info_dst ${PROJECT_BINARY_DIR}/tests)
-
-set(tests_dst)
-foreach(test ${tests_src})
-    get_filename_component(test_name ${test} NAME)
-    list(APPEND tests_dst ${tests_dst_dir}/${test_name})
-endforeach()
-list(LENGTH tests_dst tests_dst_size)
-if(tests_dst_size EQUAL 0)
-    message(SEND_ERROR "No tests found at ${tests_src_dir}.")
-endif()
-
-add_custom_command(OUTPUT ${tests_info_dst} ${tests_dst}
-    DEPENDS ${tests_info_src} ${tests_src}
-    COMMAND ${PROJECT_NAME} ${tests_info_dst} ${tests_dst_dir} ${tests_src}
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-add_custom_target(tests_target ALL DEPENDS ${tests_info_dst} ${tests_dst})
-
-# Installation
-install(FILES ${tests_dst} DESTINATION share/tests)
-install(FILES ${tests_info_dst} DESTINATION etc)
+bunsan_install_targets(${PROJECT_NAME})
+install(FILES TestsCMakeLists.txt DESTINATION . RENAME CMakeLists.txt )
