@@ -4,11 +4,10 @@ include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
 cmake_minimum_required(VERSION 2.8)
 
-include(YandexContestCommon)
+include(BunsanCommon)
 
-bunsan_use_boost(system filesystem serialization iostreams unit_test_framework program_options thread)
+bunsan_use_boost(system filesystem serialization unit_test_framework program_options thread)
 bunsan_use_bunsan(common)
-bunsan_use(yandex_contest_common)
 
 bunsan_add_executable(${PROJECT_NAME}
     src/main.cpp
