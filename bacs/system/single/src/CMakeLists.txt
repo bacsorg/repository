@@ -53,6 +53,7 @@ bunsan_add_executable(${PROJECT_NAME}
     src/lib/builders/interpretable.cpp
     src/lib/builders/python.cpp
     src/lib/builders/java.cpp
+    src/lib/builders/mono.cpp
 )
 
 bunsan_install_headers()
