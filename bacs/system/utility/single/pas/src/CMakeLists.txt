@@ -14,7 +14,7 @@ foreach(lib ${libraries})
     list(APPEND fpc_libs -Fu${lib_path} -Fi${lib_path})
 endforeach()
 add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/${target}
-    COMMAND fpc -TLINUX -FU${PROJECT_BINARY_DIR} ${fpc_libs} -Mdelphi ${PROJECT_SOURCE_DIR}/src/${source} -o${PROJECT_BINARY_DIR}/${target})
+    COMMAND fpc -TLINUX -FU${PROJECT_BINARY_DIR} ${fpc_libs} -Mdelphi -O2 ${PROJECT_SOURCE_DIR}/src/${source} -o${PROJECT_BINARY_DIR}/${target})
 add_custom_target(${target}_target ALL
     DEPENDS ${PROJECT_BINARY_DIR}/${target})
 
