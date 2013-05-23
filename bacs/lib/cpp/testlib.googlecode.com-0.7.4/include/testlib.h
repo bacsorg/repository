@@ -110,12 +110,9 @@ const char* latestFeatures[] = {
 
 #include <fcntl.h>
 
-#if !defined(unix) && !defined(__APPLE__)
-#include <io.h>
-#endif
-
 #if ( _WIN32 || __WIN32__ || _WIN64 || __WIN64__ )
 #include <windows.h>
+#include <io.h>
 #define ON_WINDOWS
 #else
 #define WORD unsigned short
