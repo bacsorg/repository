@@ -115,6 +115,7 @@ const char* latestFeatures[] = {
 #include <io.h>
 #define ON_WINDOWS
 #else
+#define unix
 #define WORD unsigned short
 #endif
 
