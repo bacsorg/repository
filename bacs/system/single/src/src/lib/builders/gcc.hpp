@@ -1,6 +1,6 @@
 #include "native_compilable.hpp"
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     class gcc: public native_compilable
     {
@@ -18,4 +18,4 @@ namespace bacs{namespace single{namespace builders
     private:
         static const bool factory_reg_hook;
     };
-}}}
+}}}}

@@ -1,5 +1,7 @@
-#include "bacs/single/testing.hpp"
-#include "bacs/single/error.hpp"
+#include "bacs/system/single/testing.hpp"
+#include "bacs/system/single/error.hpp"
+
+#include "bacs/problem/single/task.pb.h"
 
 #include "yandex/contest/TypeInfo.hpp"
 #include "yandex/contest/system/Trace.hpp"
@@ -8,7 +10,7 @@
 
 #include <boost/assert.hpp>
 
-using namespace bacs::single;
+using namespace bacs::system::single;
 
 int main(int argc, char *argv[])
 {
@@ -17,10 +19,10 @@ int main(int argc, char *argv[])
         yandex::contest::system::Trace::handle(SIGABRT);
         BOOST_ASSERT(argc == 1);
         (void) argv;
-        api::pb::task::Task task;
+        bacs::problem::single::task::Task task;
         if (!task.ParseFromIstream(&std::cin))
-            BOOST_THROW_EXCEPTION(bacs::single::error() <<
-                                  bacs::single::error::message("Unable to parse task."));
+            BOOST_THROW_EXCEPTION(bacs::system::single::error() <<
+                                  bacs::system::single::error::message("Unable to parse task."));
         testing testing_(task.callbacks());
         testing_.test(task.solution(), task.testing());
     }

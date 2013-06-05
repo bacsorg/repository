@@ -1,6 +1,6 @@
 #include "interpretable.hpp"
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     compilable::name_type interpretable::name(const std::string &/*source*/)
     {
@@ -36,4 +36,4 @@ namespace bacs{namespace single{namespace builders
     {
         return m_flags;
     }
-}}}
+}}}}

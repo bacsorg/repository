@@ -1,7 +1,7 @@
 #include "bunsan/config.hpp"
 #include "bunsan/system_error.hpp"
 
-#include "bacs/single/tests.hpp"
+#include "bacs/system/single/tests.hpp"
 
 #include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
@@ -11,9 +11,9 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include "yandex/contest/serialization/unordered_set.hpp"
+#include "bunsan/serialization/unordered_set.hpp"
 
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     class tests::impl
     {
@@ -68,4 +68,4 @@ namespace bacs{namespace single
     {
         return pimpl->test_set;
     }
-}}
+}}}

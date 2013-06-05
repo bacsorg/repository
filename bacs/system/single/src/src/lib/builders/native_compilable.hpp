@@ -2,7 +2,7 @@
 
 #include "compilable.hpp"
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     class native_compilable: public compilable
     {
@@ -23,4 +23,4 @@ namespace bacs{namespace single{namespace builders
             const ProcessGroupPointer &process_group,
             const ProcessArguments &arguments) override;
     };
-}}}
+}}}}

@@ -1,30 +1,30 @@
-#include "bacs/single/testing.hpp"
+#include "bacs/system/single/testing.hpp"
 
 #include "yandex/contest/invoker/All.hpp"
+
+#include <boost/algorithm/string/classification.hpp>
 
 #include <algorithm>
 #include <functional>
 
 #include <cstdint>
 
-#include <boost/algorithm/string/classification.hpp>
-
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     using namespace yandex::contest::invoker;
 
-    testing::testing(const api::pb::task::Callbacks &callbacks):
+    testing::testing(const problem::single::task::Callbacks &callbacks):
         m_result_cb(callbacks.result()),
         m_container(Container::create(ContainerConfig::fromEnvironment()))
     {
         if (callbacks.has_intermediate())
             m_intermediate_cb.assign(callbacks.intermediate());
-        m_intermediate.set_state(api::pb::intermediate::INITIALIZED);
+        m_intermediate.set_state(problem::single::intermediate::INITIALIZED);
         send_intermediate();
     }
 
-    void testing::test(const api::pb::task::Solution &solution,
-                       const api::pb::testing::SolutionTesting &testing)
+    void testing::test(const problem::single::task::Solution &solution,
+                       const problem::single::testing::SolutionTesting &testing)
     {
         check_hash() && build(solution) && test(testing);
         send_result();
@@ -33,11 +33,11 @@ namespace bacs{namespace single
     bool testing::check_hash()
     {
         // TODO
-        m_result.mutable_system()->set_status(api::pb::result::SystemResult::OK);
+        m_result.mutable_system()->set_status(problem::single::result::SystemResult::OK);
         return true;
     }
 
-    bool testing::test(const api::pb::testing::SolutionTesting &testing)
+    bool testing::test(const problem::single::testing::SolutionTesting &testing)
     {
         test(testing, *m_result.mutable_testing_result());
         // top-level testing is always successful
@@ -54,27 +54,27 @@ namespace bacs{namespace single
         m_result_cb.call(m_result);
     }
 
-    void testing::test(const api::pb::testing::SolutionTesting &testing,
-                       api::pb::result::SolutionTestingResult &result)
+    void testing::test(const problem::single::testing::SolutionTesting &testing,
+                       problem::single::result::SolutionTestingResult &result)
     {
-        m_intermediate.set_state(api::pb::intermediate::TESTING);
+        m_intermediate.set_state(problem::single::intermediate::TESTING);
         // TODO test group dependencies
-        for (const api::pb::testing::TestGroup &test_group: testing.test_groups())
+        for (const problem::single::testing::TestGroup &test_group: testing.test_groups())
             test(test_group, *result.add_test_groups());
     }
 
-    bool testing::test(const api::pb::testing::TestGroup &test_group,
-                       api::pb::result::TestGroupResult &result)
+    bool testing::test(const problem::single::testing::TestGroup &test_group,
+                       problem::single::result::TestGroupResult &result)
     {
         m_intermediate.set_test_group_id(test_group.id());
         result.set_id(test_group.id());
-        const api::pb::settings::TestGroupSettings &settings = test_group.settings();
+        const problem::single::settings::TestGroupSettings &settings = test_group.settings();
         const std::unordered_set<std::string> test_set = m_tests.test_set(test_group.test_set());
         std::vector<std::string> test_order(test_set.begin(), test_set.end());
         std::function<bool (const std::string &, const std::string &)> less;
         switch (settings.run().order())
         {
-        case api::pb::settings::Run::NUMERIC:
+        case problem::single::settings::Run::NUMERIC:
             less =
                 [](const std::string &left, const std::string &right)
                 {
@@ -88,7 +88,7 @@ namespace bacs{namespace single
                     return !std::all_of(s.begin(), s.end(), boost::algorithm::is_digit());
                 }), test_order.end());
             break;
-        case api::pb::settings::Run::LEXICOGRAPHICAL:
+        case problem::single::settings::Run::LEXICOGRAPHICAL:
             less = std::less<std::string>();
             break;
         }
@@ -98,10 +98,10 @@ namespace bacs{namespace single
             const bool ret = test(settings.process(), test_id, *result.add_tests());
             switch (settings.run().algorithm())
             {
-            case api::pb::settings::Run::ALL:
+            case problem::single::settings::Run::ALL:
                 // ret does not matter
                 break;
-            case api::pb::settings::Run::WHILE_NOT_FAIL:
+            case problem::single::settings::Run::WHILE_NOT_FAIL:
                 if (!ret)
                     return false;
                 break;
@@ -109,4 +109,4 @@ namespace bacs{namespace single
         }
         return true; // note: empty test group is OK
     }
-}}
+}}}

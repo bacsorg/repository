@@ -1,6 +1,6 @@
-#include "bacs/single/detail/checker.hpp"
+#include "bacs/system/single/detail/checker.hpp"
 
-namespace bacs{namespace single{namespace detail{namespace checker
+namespace bacs{namespace system{namespace single{namespace detail{namespace checker
 {
     result::status_type equal(std::istream &out, std::istream &hint)
     {
@@ -11,11 +11,11 @@ namespace bacs{namespace single{namespace detail{namespace checker
             while (out.get(o) && o == '\r');
             while (hint.get(c) && c == '\r');
             if (out && hint && o!=c)
-                return result::WRONG_ANSWER;
+                return problem::single::result::WRONG_ANSWER;
         }
         while (out && hint);
         if (out.eof() && hint.eof())
-            return result::OK;
+            return problem::single::result::OK;
         else
         {
             if (out.eof() && hint)
@@ -29,7 +29,7 @@ namespace bacs{namespace single{namespace detail{namespace checker
                 return seek_eof(out);
             }
             else
-                return result::WRONG_ANSWER;
+                return problem::single::result::WRONG_ANSWER;
         }
     }
 
@@ -39,8 +39,8 @@ namespace bacs{namespace single{namespace detail{namespace checker
         while (in.get(c))
         {
             if (c != '\n' && c != '\r')
-                return result::WRONG_ANSWER;
+                return problem::single::result::WRONG_ANSWER;
         }
-        return result::OK;
+        return problem::single::result::OK;
     }
-}}}}
+}}}}}

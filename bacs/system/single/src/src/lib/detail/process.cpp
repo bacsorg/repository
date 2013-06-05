@@ -1,12 +1,12 @@
-#include "bacs/single/detail/process.hpp"
+#include "bacs/system/single/detail/process.hpp"
 
 #include "yandex/contest/invoker/All.hpp"
 
-namespace bacs{namespace single{namespace detail{namespace process
+namespace bacs{namespace system{namespace single{namespace detail{namespace process
 {
     using namespace yandex::contest::invoker;
 
-    void setup(const api::pb::ResourceLimits &resource_limits,
+    void setup(const problem::single::ResourceLimits &resource_limits,
                const yandex::contest::invoker::ProcessGroupPointer &process_group,
                const yandex::contest::invoker::ProcessPointer &process)
     {
@@ -28,4 +28,4 @@ namespace bacs{namespace single{namespace detail{namespace process
         }
 #undef RLIM_UPDATE
     }
-}}}}
+}}}}}

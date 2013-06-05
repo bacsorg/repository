@@ -1,16 +1,16 @@
 #pragma once
 
-#include "bacs/single/api/pb/testing.pb.h"
+#include "bacs/system/single/error.hpp"
 
-#include "bacs/single/error.hpp"
-
-#include <string>
-#include <unordered_set>
+#include "bacs/problem/single/testing.pb.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/filesystem/path.hpp>
 
-namespace bacs{namespace single
+#include <string>
+#include <unordered_set>
+
+namespace bacs{namespace system{namespace single
 {
     struct invalid_test_query_error: virtual error {};
 
@@ -32,11 +32,11 @@ namespace bacs{namespace single
 
         /// \note implemented
         std::unordered_set<std::string> test_set(
-            const google::protobuf::RepeatedPtrField<api::pb::testing::TestQuery> &test_query);
+            const google::protobuf::RepeatedPtrField<problem::single::testing::TestQuery> &test_query);
 
     private:
         class impl;
 
         impl *pimpl;
     };
-}}
+}}}

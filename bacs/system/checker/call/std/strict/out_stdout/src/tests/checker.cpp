@@ -1,9 +1,9 @@
 #define BOOST_TEST_MODULE out_stdout
 #include <boost/test/unit_test.hpp>
 
-#include "bacs/single/detail/checker.hpp"
+#include "bacs/system/single/detail/checker.hpp"
 
-using namespace bacs::single;
+using namespace bacs::system::single;
 
 checker::result::status_type test_equal(const std::string &out, const std::string &hint)
 {

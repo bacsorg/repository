@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     class java: public interpretable
     {
@@ -16,8 +16,8 @@ namespace bacs{namespace single{namespace builders
         solution_ptr build(const ContainerPointer &container,
                            const unistd::access::Id &owner_id,
                            const std::string &source,
-                           const api::pb::ResourceLimits &resource_limits,
-                           api::pb::result::BuildResult &result) override;
+                           const problem::single::ResourceLimits &resource_limits,
+                           problem::single::result::BuildResult &result) override;
 
     protected:
         name_type name(const std::string &source);
@@ -47,4 +47,4 @@ namespace bacs{namespace single{namespace builders
     protected:
         std::vector<std::string> arguments() const override;
     };
-}}}
+}}}}

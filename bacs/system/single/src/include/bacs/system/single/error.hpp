@@ -2,7 +2,7 @@
 
 #include "bunsan/error.hpp"
 
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     struct error: virtual bunsan::error {};
 
@@ -10,4 +10,4 @@ namespace bacs{namespace single
     {
         typedef boost::error_info<struct tag_argument, std::string> argument;
     };
-}}
+}}}

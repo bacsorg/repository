@@ -2,11 +2,9 @@
 
 #include "interpretable.hpp"
 
-#include "bunsan/forward_constructor.hpp"
-
 #include <memory>
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     class mono: public interpretable
     {
@@ -30,4 +28,4 @@ namespace bacs{namespace single{namespace builders
     private:
         static const bool factory_reg_hook;
     };
-}}}
+}}}}

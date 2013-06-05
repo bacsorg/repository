@@ -1,14 +1,14 @@
 #pragma once
 
-#include "bacs/single/api/pb/result.pb.h"
+#include "bacs/problem/single/result.pb.h"
 
 #include "yandex/contest/invoker/ProcessGroup.hpp"
 #include "yandex/contest/invoker/Process.hpp"
 
-namespace bacs{namespace single{namespace detail{namespace result
+namespace bacs{namespace system{namespace single{namespace detail{namespace result
 {
     /// \return true if process has completed successfully
     bool parse(const yandex::contest::invoker::ProcessGroup::Result &process_group_result,
                const yandex::contest::invoker::Process::Result &process_result,
-               api::pb::result::Execution &result);
-}}}}
+               problem::single::result::Execution &result);
+}}}}}

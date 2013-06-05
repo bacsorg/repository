@@ -1,6 +1,6 @@
 #include "compilable.hpp"
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     class interpretable: public compilable
     {
@@ -29,4 +29,4 @@ namespace bacs{namespace single{namespace builders
         const boost::filesystem::path m_executable;
         const std::vector<std::string> m_flags;
     };
-}}}
+}}}}

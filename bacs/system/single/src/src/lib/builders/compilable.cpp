@@ -1,7 +1,7 @@
 #include "compilable.hpp"
 
-#include "bacs/single/detail/process.hpp"
-#include "bacs/single/detail/result.hpp"
+#include "bacs/system/single/detail/process.hpp"
+#include "bacs/system/single/detail/result.hpp"
 
 #include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
@@ -9,15 +9,15 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/assert.hpp>
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     static const boost::filesystem::path solutions_path = "/tmp/solutions";
 
     solution_ptr compilable::build(const ContainerPointer &container,
                                    const unistd::access::Id &owner_id,
                                    const std::string &source,
-                                   const api::pb::ResourceLimits &resource_limits,
-                                   api::pb::result::BuildResult &result)
+                                   const problem::single::ResourceLimits &resource_limits,
+                                   problem::single::result::BuildResult &result)
     {
         const boost::filesystem::path solutions = container->filesystem().keepInRoot(solutions_path);
         boost::filesystem::create_directories(solutions);
@@ -93,4 +93,4 @@ namespace bacs{namespace single{namespace builders
     {
         return dir() / m_name.executable;
     }
-}}}
+}}}}

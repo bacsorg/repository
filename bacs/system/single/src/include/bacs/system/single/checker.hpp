@@ -1,11 +1,11 @@
 #pragma once
 
-#include "bacs/single/common.hpp"
+#include "bacs/system/single/common.hpp"
 
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     /// \note must be implemented in problem
     class checker: private boost::noncopyable
@@ -38,4 +38,4 @@ namespace bacs{namespace single
 
         impl *pimpl;
     };
-}}
+}}}

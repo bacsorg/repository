@@ -4,7 +4,7 @@
 #include <boost/regex.hpp>
 #include <boost/assert.hpp>
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     const bool java::factory_reg_hook = builder::register_new("java",
         [](const std::vector<std::string> &arguments)
@@ -52,8 +52,8 @@ namespace bacs{namespace single{namespace builders
     solution_ptr java::build(const ContainerPointer &container,
                              const unistd::access::Id &owner_id,
                              const std::string &source,
-                             const api::pb::ResourceLimits &resource_limits,
-                             api::pb::result::BuildResult &result)
+                             const problem::single::ResourceLimits &resource_limits,
+                             problem::single::result::BuildResult &result)
     {
         if (m_java)
         {
@@ -114,4 +114,4 @@ namespace bacs{namespace single{namespace builders
         arguments_.push_back(name().executable.string());
         return arguments_;
     }
-}}}
+}}}}

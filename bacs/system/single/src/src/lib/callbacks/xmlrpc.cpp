@@ -5,7 +5,7 @@
 #define BUNSAN_EXCEPTIONS_WRAP_END_XMLRPC() \
     BUNSAN_EXCEPTIONS_WRAP_END_EXCEPT(::girerr::error)
 
-namespace bacs{namespace single{namespace callback{namespace callbacks
+namespace bacs{namespace system{namespace single{namespace callback{namespace callbacks
 {
     const bool xmlrpc::factory_reg_hook = base::register_new("xmlrpc",
         [](const std::vector<std::string> &arguments)
@@ -47,4 +47,4 @@ namespace bacs{namespace single{namespace callback{namespace callbacks
         }
         BUNSAN_EXCEPTIONS_WRAP_END_XMLRPC()
     }
-}}}}
+}}}}}

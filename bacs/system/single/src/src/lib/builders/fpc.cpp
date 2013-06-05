@@ -3,7 +3,7 @@
 #include <boost/regex.hpp>
 #include <boost/assert.hpp>
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     const bool fpc::factory_reg_hook = builder::register_new("fpc",
         [](const std::vector<std::string> &arguments)
@@ -57,4 +57,4 @@ namespace bacs{namespace single{namespace builders
         process->setArguments(process->executable(), m_flags, name.source, "-o" + name.executable.string());
         return process;
     }
-}}}
+}}}}

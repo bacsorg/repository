@@ -1,6 +1,6 @@
-#include "bacs/single/validator.hpp"
+#include "bacs/system/single/validator.hpp"
 
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     validator::validator() {}
     validator::~validator() {}
@@ -9,4 +9,4 @@ namespace bacs{namespace single
     {
         return result();
     }
-}}
+}}}

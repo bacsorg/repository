@@ -1,13 +1,13 @@
-#include "bacs/single/detail/file.hpp"
+#include "bacs/system/single/detail/file.hpp"
 
 #include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
 
 #include <algorithm>
 
-namespace bacs{namespace single{namespace detail{namespace file
+namespace bacs{namespace system{namespace single{namespace detail{namespace file
 {
-    boost::filesystem::path to_path(const api::pb::settings::Path &path)
+    boost::filesystem::path to_path(const problem::single::settings::Path &path)
     {
         boost::filesystem::path p;
         if (path.has_root())
@@ -27,15 +27,15 @@ namespace bacs{namespace single{namespace detail{namespace file
         BUNSAN_EXCEPTIONS_WRAP_END()
     }
 
-    mode_t mode(const api::pb::settings::File::Permissions &value)
+    mode_t mode(const problem::single::settings::File::Permissions &value)
     {
         switch (value)
         {
-        case api::pb::settings::File::READ:
+        case problem::single::settings::File::READ:
             return 0444;
-        case api::pb::settings::File::WRITE:
+        case problem::single::settings::File::WRITE:
             return 0222;
-        case api::pb::settings::File::EXECUTE:
+        case problem::single::settings::File::EXECUTE:
             return 0111;
         default:
             BOOST_ASSERT(false);
@@ -48,8 +48,8 @@ namespace bacs{namespace single{namespace detail{namespace file
         mode_t m = 0;
         for (const int p: permissions)
         {
-            m |= mode(static_cast<api::pb::settings::File::Permissions>(p));
+            m |= mode(static_cast<problem::single::settings::File::Permissions>(p));
         }
         return m;
     }
-}}}}
+}}}}}

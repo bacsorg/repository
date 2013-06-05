@@ -1,13 +1,13 @@
-#include "bacs/single/tests.hpp"
-
-#include <memory>
+#include "bacs/system/single/tests.hpp"
 
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/regex.hpp>
 
+#include <memory>
+
 #include <fnmatch.h>
 
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     namespace
     {
@@ -53,7 +53,7 @@ namespace bacs{namespace single
             class wildcard: public impl
             {
             public:
-                explicit wildcard(const api::pb::testing::WildcardQuery &query):
+                explicit wildcard(const problem::single::testing::WildcardQuery &query):
                     m_wildcard(query.value()), m_flags(flags(query)) {}
 
                 bool match(const std::string &test_id) const override
@@ -65,14 +65,14 @@ namespace bacs{namespace single
                 }
 
             private:
-                int flags(const api::pb::testing::WildcardQuery &query)
+                int flags(const problem::single::testing::WildcardQuery &query)
                 {
                     int flags_ = 0;
                     for (const int flag: query.flags())
                     {
-                        switch (static_cast<api::pb::testing::WildcardQuery::Flag>(flag))
+                        switch (static_cast<problem::single::testing::WildcardQuery::Flag>(flag))
                         {
-                        case api::pb::testing::WildcardQuery::IGNORE_CASE:
+                        case problem::single::testing::WildcardQuery::IGNORE_CASE:
                             flags_ |= FNM_CASEFOLD;
                             break;
                         }
@@ -88,7 +88,7 @@ namespace bacs{namespace single
             class regex: public impl
             {
             public:
-                explicit regex(const api::pb::testing::RegexQuery &query):
+                explicit regex(const problem::single::testing::RegexQuery &query):
                     m_regex(query.value(), flags(query)) {}
 
                 bool match(const std::string &test_id) const override
@@ -98,14 +98,14 @@ namespace bacs{namespace single
 
             private:
                 boost::regex_constants::syntax_option_type flags(
-                    const api::pb::testing::RegexQuery &query)
+                    const problem::single::testing::RegexQuery &query)
                 {
                     boost::regex_constants::syntax_option_type flags_ = boost::regex_constants::normal;
                     for (const int flag: query.flags())
                     {
-                        switch (static_cast<api::pb::testing::RegexQuery::Flag>(flag))
+                        switch (static_cast<problem::single::testing::RegexQuery::Flag>(flag))
                         {
-                        case api::pb::testing::RegexQuery::IGNORE_CASE:
+                        case problem::single::testing::RegexQuery::IGNORE_CASE:
                             flags_ |= boost::regex_constants::icase;
                             break;
                         }
@@ -131,15 +131,15 @@ namespace bacs{namespace single
 
         private:
             static std::unique_ptr<impl> impl_(
-                const google::protobuf::RepeatedPtrField<api::pb::testing::TestQuery> &test_query)
+                const google::protobuf::RepeatedPtrField<problem::single::testing::TestQuery> &test_query)
             {
                 std::unique_ptr<any_of> tmp(new any_of);
-                for (const api::pb::testing::TestQuery &query: test_query)
+                for (const problem::single::testing::TestQuery &query: test_query)
                     tmp->push_back(impl_(query));
                 return std::move(tmp);
             }
 
-            static std::unique_ptr<impl> impl_(const api::pb::testing::TestQuery &query)
+            static std::unique_ptr<impl> impl_(const problem::single::testing::TestQuery &query)
             {
                 std::unique_ptr<impl> tmp;
                 if (query.has_id())
@@ -159,7 +159,7 @@ namespace bacs{namespace single
     }
 
     std::unordered_set<std::string> tests::test_set(
-        const google::protobuf::RepeatedPtrField<api::pb::testing::TestQuery> &test_query)
+        const google::protobuf::RepeatedPtrField<problem::single::testing::TestQuery> &test_query)
     {
         const matcher m(test_query);
         const std::unordered_set<std::string> full_set = test_set();
@@ -168,4 +168,4 @@ namespace bacs{namespace single
             boost::make_filter_iterator(m, full_set.end())
         };
     }
-}}
+}}}

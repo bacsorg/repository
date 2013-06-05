@@ -1,9 +1,9 @@
-#include "bacs/single/detail/checker.hpp"
+#include "bacs/system/single/detail/checker.hpp"
 
 #include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
 
-namespace bacs{namespace single
+namespace bacs{namespace system{namespace single
 {
     checker::checker() {}
     checker::~checker() {}
@@ -20,5 +20,4 @@ namespace bacs{namespace single
         BUNSAN_EXCEPTIONS_WRAP_END()
         return result_;
     }
-}}
-
+}}}

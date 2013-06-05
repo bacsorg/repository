@@ -1,12 +1,12 @@
 #pragma once
 
-#include "bacs/single/builder.hpp"
+#include "bacs/system/single/builder.hpp"
 
 #include "bunsan/tempfile.hpp"
 
 #include "yandex/contest/invoker/All.hpp"
 
-namespace bacs{namespace single{namespace builders
+namespace bacs{namespace system{namespace single{namespace builders
 {
     using namespace yandex::contest::invoker;
     namespace unistd = yandex::contest::system::unistd;
@@ -23,8 +23,8 @@ namespace bacs{namespace single{namespace builders
         solution_ptr build(const ContainerPointer &container,
                            const unistd::access::Id &owner_id,
                            const std::string &source,
-                           const api::pb::ResourceLimits &resource_limits,
-                           api::pb::result::BuildResult &result) override;
+                           const problem::single::ResourceLimits &resource_limits,
+                           problem::single::result::BuildResult &result) override;
 
     protected:
         virtual name_type name(const std::string &source);
@@ -56,4 +56,4 @@ namespace bacs{namespace single{namespace builders
         const bunsan::tempfile m_tmpdir;
         const compilable::name_type m_name;
     };
-}}}
+}}}}

@@ -1,23 +1,23 @@
 #pragma once
 
-#include "bacs/single/error.hpp"
+#include "bacs/system/single/error.hpp"
 
-#include "bacs/single/api/pb/task.pb.h"
-#include "bacs/single/api/pb/result.pb.h"
-#include "bacs/single/api/pb/intermediate.pb.h"
+#include "bacs/problem/single/task.pb.h"
+#include "bacs/problem/single/result.pb.h"
+#include "bacs/problem/single/intermediate.pb.h"
 
 #include "bunsan/factory_helper.hpp"
+
+#include <boost/noncopyable.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 #include <string>
 #include <vector>
 #include <iterator>
 #include <functional>
 
-#include <boost/noncopyable.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/iterator/transform_iterator.hpp>
-
-namespace bacs{namespace single{namespace callback
+namespace bacs{namespace system{namespace single{namespace callback
 {
     struct error: virtual single::error {};
     struct serialization_error: virtual error {};
@@ -36,7 +36,7 @@ namespace bacs{namespace single{namespace callback
         virtual ~base() {}
 
     public:
-        static base_ptr instance(const api::pb::task::Callback &config);
+        static base_ptr instance(const problem::single::task::Callback &config);
 
     public:
         typedef std::vector<unsigned char> data_type;
@@ -76,7 +76,7 @@ namespace bacs{namespace single{namespace callback
 
         explicit interface(const base_ptr &base_): m_base(base_) {}
 
-        explicit interface(const api::pb::task::Callback &config):
+        explicit interface(const problem::single::task::Callback &config):
             interface(base::instance(config)) {}
 
         template <typename Y>
@@ -113,6 +113,6 @@ namespace bacs{namespace single{namespace callback
         a.swap(b);
     }
 
-    typedef interface<api::pb::result::Result> result;
-    typedef interface<api::pb::intermediate::Result> intermediate;
-}}}
+    typedef interface<problem::single::result::Result> result;
+    typedef interface<problem::single::intermediate::Result> intermediate;
+}}}}

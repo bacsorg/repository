@@ -1,4 +1,4 @@
-project(bacs_single)
+project(bacs_system_single)
 
 include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
@@ -9,7 +9,7 @@ include(YandexContestCommon)
 bunsan_use_boost(system filesystem serialization iostreams unit_test_framework program_options regex thread)
 bunsan_use_xmlrpc(c++2 libwww-client abyss-server)
 bunsan_use_protobuf()
-bunsan_use_bunsan(common pm bacs_single_api)
+bunsan_use_bunsan(common pm bacs_problem bacs_problem_single)
 bunsan_use(
     yandex_contest_common
     yandex_contest_system
