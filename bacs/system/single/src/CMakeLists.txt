@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 
 include(YandexContestCommon)
 
-bunsan_use_boost(system filesystem serialization iostreams unit_test_framework program_options regex thread)
+bunsan_use_boost(system filesystem serialization iostreams program_options regex thread)
 bunsan_use_xmlrpc(c++2 libwww-client abyss-server)
 bunsan_use_protobuf()
 bunsan_use_bunsan(common pm bacs_problem bacs_problem_single)
