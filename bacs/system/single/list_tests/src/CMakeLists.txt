@@ -1,4 +1,4 @@
-project(bunsan_bacs_system_driver_simple0_tests_builder)
+project(bunsan_bacs_system_single_list_tests_builder)
 
 include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 

@@ -1,11 +1,12 @@
-#include "bunsan/config.hpp"
-#include "bunsan/enable_error_info.hpp"
-#include "bunsan/stream_enum.hpp"
-#include "bunsan/filesystem/fstream.hpp"
+#include <bunsan/config.hpp>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <bunsan/enable_error_info.hpp>
+#include <bunsan/filesystem/fstream.hpp>
+#include <bunsan/stream_enum.hpp>
+
 #include <boost/assert.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -19,7 +20,6 @@ namespace
     struct not_cr_eoln_in_cr_file: virtual newline_error {};
     struct not_lf_eoln_in_lf_file: virtual newline_error {};
     struct not_crlf_eoln_in_crlf_file: virtual newline_error {};
-
 
     BUNSAN_STREAM_ENUM(eoln,
     (
@@ -37,10 +37,11 @@ namespace
 
     eoln transform(const boost::filesystem::path &src, const boost::filesystem::path &dst)
     {
-        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+        bunsan::filesystem::ifstream fin(src, std::ios_base::binary);
+        bunsan::filesystem::ofstream fout(dst, std::ios_base::binary);
+        // TODO wrap fin errors
+        BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
         {
-            bunsan::filesystem::ifstream fin(src, std::ios_base::binary);
-            bunsan::filesystem::ofstream fout(dst, std::ios_base::binary);
             eoln state = NA;
             char c, p;
             while (fin.get(c) && fout)
@@ -112,7 +113,7 @@ namespace
             fout.close();
             return state;
         }
-        BUNSAN_EXCEPTIONS_WRAP_END()
+        BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
     }
 }
 
@@ -120,26 +121,26 @@ int main(int argc, char *argv[])
 {
     BOOST_ASSERT(argc >= 2 + 1);
     std::unordered_set<std::string> test_set, data_set, text_data_set;
-    BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+    bunsan::filesystem::ifstream fin("etc/tests");
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin)
     {
-        bunsan::filesystem::ifstream fin("etc/tests");
         {
             boost::archive::text_iarchive ia(fin);
             ia >> test_set >> data_set >> text_data_set;
         }
-        fin.close();
     }
-    BUNSAN_EXCEPTIONS_WRAP_END()
-    BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fin)
+    fin.close();
+    bunsan::filesystem::ofstream fout(argv[1]);
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
     {
-        bunsan::filesystem::ofstream fout(argv[1]);
         {
             boost::archive::text_oarchive oa(fout);
             oa << test_set << data_set;
         }
-        fout.close();
     }
-    BUNSAN_EXCEPTIONS_WRAP_END()
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+    fout.close();
     const boost::filesystem::path dst_dir = argv[2];
     for (int i = 3; i < argc; ++i)
     {
