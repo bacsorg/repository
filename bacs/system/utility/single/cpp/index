@@ -1,7 +1,10 @@
 source
 {
-    self
+    import
     {
-        . src
+        source
+        {
+            . bacs/system/utility/single/c_cpp
+        }
     }
 }
