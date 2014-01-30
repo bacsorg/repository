@@ -31,12 +31,14 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace resu
             case Process::Result::CompletionStatus::MEMORY_LIMIT_EXCEEDED:
                 result.set_status(problem::single::result::Execution::MEMORY_LIMIT_EXCEEDED);
                 break;
-            case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
+            case Process::Result::CompletionStatus::TIME_LIMIT_EXCEEDED:
                 result.set_status(problem::single::result::Execution::TIME_LIMIT_EXCEEDED);
                 break;
             case Process::Result::CompletionStatus::OUTPUT_LIMIT_EXCEEDED:
                 result.set_status(problem::single::result::Execution::OUTPUT_LIMIT_EXCEEDED);
                 break;
+            case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
+            case Process::Result::CompletionStatus::SYSTEM_TIME_LIMIT_EXCEEDED:
             case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
             case Process::Result::CompletionStatus::START_FAILED:
             case Process::Result::CompletionStatus::STOPPED:
