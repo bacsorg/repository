@@ -166,6 +166,9 @@ namespace bacs{namespace system{namespace single
             case checker::result::FAIL_TEST:
                 checking.set_status(problem::single::result::TestResult::Checking::FAIL_TEST);
                 break;
+            case checker::result::FAILED:
+                checking.set_status(problem::single::result::TestResult::Checking::FAILED);
+                break;
             }
             // TODO change protobuffers to appropriate format
             if (checker_result.message)

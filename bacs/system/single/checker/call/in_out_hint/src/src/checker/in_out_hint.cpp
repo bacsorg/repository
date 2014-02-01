@@ -89,31 +89,33 @@ namespace bacs{namespace system{namespace single
                         result_.status = checker::result::PRESENTATION_ERROR;
                         break;
                     default:
-                        result_.status = checker::result::FAIL_TEST;
+                        result_.status = checker::result::FAILED;
                     }
                     // TODO load log
                     result_.message = "TODO";
                 }
                 else
                 {
-                    result_.status = checker::result::FAIL_TEST;
+                    result_.status = checker::result::FAILED;
                     result_.message = "CRASH";
                 }
                 break;
             case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
             case Process::Result::CompletionStatus::MEMORY_LIMIT_EXCEEDED:
+            case Process::Result::CompletionStatus::TIME_LIMIT_EXCEEDED:
+            case Process::Result::CompletionStatus::SYSTEM_TIME_LIMIT_EXCEEDED:
             case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
             case Process::Result::CompletionStatus::OUTPUT_LIMIT_EXCEEDED:
             case Process::Result::CompletionStatus::START_FAILED:
             case Process::Result::CompletionStatus::STOPPED:
-                result_.status = checker::result::FAIL_TEST;
+                result_.status = checker::result::FAILED;
                 result_.message = boost::lexical_cast<std::string>(process_result.completionStatus);
                 break;
             }
             break;
         case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
         case ProcessGroup::Result::CompletionStatus::STOPPED:
-            result_.status = checker::result::FAIL_TEST;
+            result_.status = checker::result::FAILED;
             result_.message = boost::lexical_cast<std::string>(process_result.completionStatus);
             break;
         }

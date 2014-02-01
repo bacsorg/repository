@@ -18,7 +18,8 @@ namespace bacs{namespace system{namespace single
                 OK,
                 WRONG_ANSWER,
                 PRESENTATION_ERROR,
-                FAIL_TEST
+                FAIL_TEST,
+                FAILED
             };
 
             status_type status = status_type::OK;
