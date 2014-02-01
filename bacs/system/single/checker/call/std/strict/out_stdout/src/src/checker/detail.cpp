@@ -10,7 +10,7 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace chec
         {
             while (out.get(o) && o == '\r');
             while (hint.get(c) && c == '\r');
-            if (out && hint && o!=c)
+            if (out && hint && o != c)
                 return problem::single::result::WRONG_ANSWER;
         }
         while (out && hint);
