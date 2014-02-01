@@ -20,7 +20,7 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace proc
         }
         {
             Process::ResourceLimits rlimit = process->resourceLimits();
-            RLIM_UPDATE(time_limit_millis, userTimeLimit, std::chrono::milliseconds);
+            RLIM_UPDATE(time_limit_millis, timeLimit, std::chrono::milliseconds);
             RLIM_UPDATE(memory_limit_bytes, memoryLimitBytes, );
             RLIM_UPDATE(output_limit_bytes, outputLimitBytes, );
             RLIM_UPDATE(number_of_processes, numberOfProcesses, );
