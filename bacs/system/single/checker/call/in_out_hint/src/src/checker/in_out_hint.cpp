@@ -45,25 +45,42 @@ namespace bacs{namespace system{namespace single
         delete pimpl;
     }
 
-    checker::result checker::check(const file_map &test_files, const file_map &solution_files)
+    checker::result checker::check(
+        const file_map &test_files,
+        const file_map &solution_files)
     {
-        const boost::filesystem::path in = test_files.at("in"),
-            out = solution_files.at("stdout"), hint = test_files.at("out");
-        BOOST_ASSERT_MSG(test_files.size() == 2, "keys(test_files) == {'in', 'out'}");
+        const boost::filesystem::path in = test_files.at("in");
+        const boost::filesystem::path out = solution_files.at("stdout");
+        const auto hint_iter = test_files.find("out");
+        const std::string hint_arg =
+            hint_iter == test_files.end() ?
+                "/dev/null" :
+                "hint";
+        BOOST_ASSERT_MSG(
+            hint_iter == test_files.end() && test_files.size() == 1 ||
+            hint_iter != test_files.end() && test_files.size() == 2,
+            "keys(test_files) == {'in', 'out'} || keys(test_files) == {'in'}"
+        );
         result result_;
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
         // TODO process_group->setResourceLimits()
-        const ProcessPointer process = process_group->createProcess(checking_mount_path / "bin" / "checker");
+        const ProcessPointer process = process_group->createProcess(
+            checking_mount_path / "bin" / "checker");
         pimpl->container->filesystem().push(in, checking_path / "in", {0, 0}, 0444);
         pimpl->container->filesystem().push(out, checking_path / "out", {0, 0}, 0444);
-        pimpl->container->filesystem().push(hint, checking_path / "hint", {0, 0}, 0444);
-        process->setArguments(process->executable(), "in", "out", "hint");
+        if (hint_iter != test_files.end())
+        {
+            pimpl->container->filesystem().push(
+                hint_iter->second, checking_path / "hint", {0, 0}, 0444);
+        }
+        process->setArguments(process->executable(), "in", "out", hint_arg);
         process->setCurrentPath(checking_path);
         process->setStream(2, FDAlias(1));
         process->setStream(1, File(checking_log, AccessMode::WRITE_ONLY));
         // TODO process->setResourceLimits()
         // execute
-        const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
+        const ProcessGroup::Result process_group_result =
+            process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         switch (process_group_result.completionStatus)
         {
@@ -109,14 +126,16 @@ namespace bacs{namespace system{namespace single
             case Process::Result::CompletionStatus::START_FAILED:
             case Process::Result::CompletionStatus::STOPPED:
                 result_.status = checker::result::FAILED;
-                result_.message = boost::lexical_cast<std::string>(process_result.completionStatus);
+                result_.message = boost::lexical_cast<std::string>(
+                    process_result.completionStatus);
                 break;
             }
             break;
         case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
         case ProcessGroup::Result::CompletionStatus::STOPPED:
             result_.status = checker::result::FAILED;
-            result_.message = boost::lexical_cast<std::string>(process_result.completionStatus);
+            result_.message = boost::lexical_cast<std::string>(
+                process_result.completionStatus);
             break;
         }
         return result_;
