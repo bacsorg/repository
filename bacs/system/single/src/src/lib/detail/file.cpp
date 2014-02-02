@@ -1,6 +1,5 @@
 #include "bacs/system/single/detail/file.hpp"
 
-#include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
 
 #include <algorithm>
@@ -19,12 +18,8 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace file
 
     void touch(const boost::filesystem::path &path)
     {
-        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
-        {
-            bunsan::filesystem::ofstream fout(path);
-            fout.close();
-        }
-        BUNSAN_EXCEPTIONS_WRAP_END()
+        bunsan::filesystem::ofstream fout(path);
+        fout.close();
     }
 
     mode_t mode(const problem::single::settings::File::Permissions &value)

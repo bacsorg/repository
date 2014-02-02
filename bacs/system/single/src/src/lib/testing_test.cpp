@@ -6,7 +6,6 @@
 
 #include "bacs/problem/single/resource.pb.h"
 
-#include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
 #include "bunsan/tempfile.hpp"
 
@@ -122,9 +121,9 @@ namespace bacs{namespace system{namespace single
             problem::single::result::TestResult::File &file = *result.add_files();
             file.set_id(r.id);
             std::string &data = *file.mutable_data();
-            BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+            bunsan::filesystem::ifstream fin(r.path, std::ios::binary);
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin)
             {
-                bunsan::filesystem::ifstream fin(r.path, std::ios::binary);
                 switch (r.range.whence())
                 {
                 case problem::single::settings::File::Range::BEGIN:
@@ -140,9 +139,9 @@ namespace bacs{namespace system{namespace single
                     fin.read(buf, std::min(sizeof(buf), r.range.size() - data.size()));
                     data.insert(data.end(), buf, buf + fin.gcount());
                 }
-                fin.close();
             }
-            BUNSAN_EXCEPTIONS_WRAP_END()
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fin)
+            fin.close();
         }
         if (execution_success)
         {

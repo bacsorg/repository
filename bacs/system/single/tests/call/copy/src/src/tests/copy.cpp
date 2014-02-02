@@ -3,7 +3,6 @@
 
 #include "bacs/system/single/tests.hpp"
 
-#include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
 
 #include <boost/filesystem/operations.hpp>
@@ -25,16 +24,14 @@ namespace bacs{namespace system{namespace single
     {
         try
         {
-            BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+            bunsan::filesystem::ifstream fin("etc/tests");
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin)
             {
-                bunsan::filesystem::ifstream fin("etc/tests");
-                {
-                    boost::archive::text_iarchive ia(fin);
-                    ia >> pimpl->test_set >> pimpl->data_set;
-                }
-                fin.close();
+                boost::archive::text_iarchive ia(fin);
+                ia >> pimpl->test_set >> pimpl->data_set;
             }
-            BUNSAN_EXCEPTIONS_WRAP_END()
+            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fin)
+            fin.close();
         }
         catch (...)
         {

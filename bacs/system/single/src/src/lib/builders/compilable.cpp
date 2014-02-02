@@ -3,7 +3,6 @@
 #include "bacs/system/single/detail/process.hpp"
 #include "bacs/system/single/detail/result.hpp"
 
-#include "bunsan/enable_error_info.hpp"
 #include "bunsan/filesystem/fstream.hpp"
 
 #include <boost/filesystem/operations.hpp>
@@ -19,20 +18,23 @@ namespace bacs{namespace system{namespace single{namespace builders
                                    const problem::single::ResourceLimits &resource_limits,
                                    problem::single::result::BuildResult &result)
     {
-        const boost::filesystem::path solutions = container->filesystem().keepInRoot(solutions_path);
+        const boost::filesystem::path solutions =
+            container->filesystem().keepInRoot(solutions_path);
         boost::filesystem::create_directories(solutions);
         bunsan::tempfile tmpdir = bunsan::tempfile::in_dir(solutions);
         BOOST_VERIFY(boost::filesystem::create_directory(tmpdir.path()));
-        container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename(), owner_id);
+        container->filesystem().setOwnerId(
+            solutions_path / tmpdir.path().filename(), owner_id);
         const name_type name_ = name(source);
-        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+        bunsan::filesystem::ofstream fout(tmpdir.path() / name_.source);
+        BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
         {
-            bunsan::filesystem::ofstream fout(tmpdir.path() / name_.source);
             fout << source;
-            fout.close();
         }
-        BUNSAN_EXCEPTIONS_WRAP_END()
-        container->filesystem().setOwnerId(solutions_path / tmpdir.path().filename() / name_.source, owner_id);
+        BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+        fout.close();
+        container->filesystem().setOwnerId(
+            solutions_path / tmpdir.path().filename() / name_.source, owner_id);
         const ProcessGroupPointer process_group = container->createProcessGroup();
         const ProcessPointer process = create_process(process_group, name_);
         detail::process::setup(resource_limits, process_group, process);
@@ -42,17 +44,18 @@ namespace bacs{namespace system{namespace single{namespace builders
         process->setStream(1, File("log", AccessMode::WRITE_ONLY));
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
-        const bool success = detail::result::parse(process_group_result, process_result, *result.mutable_execution());
-        BUNSAN_EXCEPTIONS_WRAP_BEGIN()
+        const bool success = detail::result::parse(
+            process_group_result, process_result, *result.mutable_execution());
+        bunsan::filesystem::ifstream fin(tmpdir.path() / "log");
+        BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin)
         {
-            bunsan::filesystem::ifstream fin(tmpdir.path() / "log");
             std::string &output = *result.mutable_output();
             char buf[4096];
             fin.read(buf, sizeof(buf));
-            output.assign(buf,fin.gcount());
-            fin.close();
+            output.assign(buf, fin.gcount());
         }
-        BUNSAN_EXCEPTIONS_WRAP_END()
+        BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fin)
+        fin.close();
         if (success)
             return create_solution(container, std::move(tmpdir), name_);
         else
