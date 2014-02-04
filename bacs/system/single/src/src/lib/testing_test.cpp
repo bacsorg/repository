@@ -118,7 +118,7 @@ namespace bacs{namespace system{namespace single
         for (const receive_type &r: receive)
         {
             BOOST_ASSERT(boost::filesystem::exists(r.path));
-            problem::single::result::TestResult::File &file = *result.add_files();
+            problem::single::result::File &file = *result.add_files();
             file.set_id(r.id);
             std::string &data = *file.mutable_data();
             bunsan::filesystem::ifstream fin(r.path, std::ios::binary);
@@ -150,32 +150,31 @@ namespace bacs{namespace system{namespace single
                 data_id_path.second = m_container->filesystem().keepInRoot(data_id_path.second);
             const checker::result checker_result = m_checker.check(test_files, solution_files);
             // fill checker result
-            problem::single::result::TestResult::Checking &checking = *result.mutable_checking();
+            problem::single::result::Judge &judge = *result.mutable_judge();
             switch (checker_result.status)
             {
             case checker::result::OK:
-                checking.set_status(problem::single::result::TestResult::Checking::OK);
+                judge.set_status(problem::single::result::Judge::OK);
                 break;
             case checker::result::WRONG_ANSWER:
-                checking.set_status(problem::single::result::TestResult::Checking::WRONG_ANSWER);
+                judge.set_status(problem::single::result::Judge::WRONG_ANSWER);
                 break;
             case checker::result::PRESENTATION_ERROR:
-                checking.set_status(problem::single::result::TestResult::Checking::PRESENTATION_ERROR);
+                judge.set_status(problem::single::result::Judge::PRESENTATION_ERROR);
                 break;
             case checker::result::FAIL_TEST:
-                checking.set_status(problem::single::result::TestResult::Checking::FAIL_TEST);
+                judge.set_status(problem::single::result::Judge::FAIL_TEST);
                 break;
             case checker::result::FAILED:
-                checking.set_status(problem::single::result::TestResult::Checking::FAILED);
+                judge.set_status(problem::single::result::Judge::FAILED);
                 break;
             }
             // TODO change protobuffers to appropriate format
             if (checker_result.message)
-                checking.set_output(checker_result.message.get());
-            else
-                checking.set_output("");
+                judge.set_message(checker_result.message.get());
+            // TODO execution
         }
         return result.execution().status() == problem::single::result::Execution::OK &&
-            result.checking().status() == problem::single::result::TestResult::Checking::OK;
+            result.judge().status() == problem::single::result::Judge::OK;
     }
 }}}

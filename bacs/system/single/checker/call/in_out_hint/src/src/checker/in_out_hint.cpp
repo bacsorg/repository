@@ -57,8 +57,8 @@ namespace bacs{namespace system{namespace single
                 "/dev/null" :
                 "hint";
         BOOST_ASSERT_MSG(
-            hint_iter == test_files.end() && test_files.size() == 1 ||
-            hint_iter != test_files.end() && test_files.size() == 2,
+            (hint_iter == test_files.end() && test_files.size() == 1) ||
+            (hint_iter != test_files.end() && test_files.size() == 2),
             "keys(test_files) == {'in', 'out'} || keys(test_files) == {'in'}"
         );
         result result_;
@@ -108,13 +108,13 @@ namespace bacs{namespace system{namespace single
                     default:
                         result_.status = checker::result::FAILED;
                     }
+                    // TODO load message
                     // TODO load log
-                    result_.message = "TODO";
                 }
                 else
                 {
                     result_.status = checker::result::FAILED;
-                    result_.message = "CRASH";
+                    // TODO load log
                 }
                 break;
             case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
@@ -126,16 +126,12 @@ namespace bacs{namespace system{namespace single
             case Process::Result::CompletionStatus::START_FAILED:
             case Process::Result::CompletionStatus::STOPPED:
                 result_.status = checker::result::FAILED;
-                result_.message = boost::lexical_cast<std::string>(
-                    process_result.completionStatus);
                 break;
             }
             break;
         case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
         case ProcessGroup::Result::CompletionStatus::STOPPED:
             result_.status = checker::result::FAILED;
-            result_.message = boost::lexical_cast<std::string>(
-                process_result.completionStatus);
             break;
         }
         return result_;
