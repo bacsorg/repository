@@ -3,6 +3,8 @@
 #include <yandex/contest/invoker/All.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -12,10 +14,42 @@
 namespace bacs{namespace system{namespace single
 {
     using namespace yandex::contest::invoker;
+    namespace unistd = yandex::contest::system::unistd;
+
+    static ContainerConfig testing_config(ContainerConfig config)
+    {
+        if (!config.lxcConfig.mount)
+            config.lxcConfig.mount = yandex::contest::system::lxc::MountConfig();
+        if (!config.lxcConfig.mount->entries)
+            config.lxcConfig.mount->entries = std::vector<unistd::MountEntry>();
+
+        filesystem::Directory dir;
+        dir.mode = 0555;
+
+        dir.path = testing::PROBLEM_ROOT;
+        config.filesystemConfig.createFiles.push_back(filesystem::CreateFile(dir));
+
+        const boost::filesystem::path bin = boost::filesystem::current_path() / "bin";
+        dir.path = testing::PROBLEM_BIN;
+        config.filesystemConfig.createFiles.push_back(filesystem::CreateFile(dir));
+        if (boost::filesystem::exists(bin))
+            config.lxcConfig.mount->entries->push_back(
+                unistd::MountEntry::bindRO(bin, testing::PROBLEM_BIN));
+
+        const boost::filesystem::path lib = boost::filesystem::current_path() / "lib";
+        dir.path = testing::PROBLEM_LIB;
+        config.filesystemConfig.createFiles.push_back(filesystem::CreateFile(dir));
+        if (boost::filesystem::exists(lib))
+            config.lxcConfig.mount->entries->push_back(
+                unistd::MountEntry::bindRO(lib, testing::PROBLEM_LIB));
+
+        return config;
+    }
 
     testing::testing(const problem::single::task::Callbacks &callbacks):
-        m_result_cb(callbacks.result()),
-        m_container(Container::create(ContainerConfig::fromEnvironment()))
+        m_container(Container::create(testing_config(ContainerConfig::fromEnvironment()))),
+        m_checker(m_container),
+        m_result_cb(callbacks.result())
     {
         if (callbacks.has_intermediate())
             m_intermediate_cb.assign(callbacks.intermediate());
@@ -109,4 +143,8 @@ namespace bacs{namespace system{namespace single
         }
         return true; // note: empty test group is OK
     }
+
+    const boost::filesystem::path testing::PROBLEM_ROOT = "/problem_root";
+    const boost::filesystem::path testing::PROBLEM_BIN = testing::PROBLEM_ROOT / "bin";
+    const boost::filesystem::path testing::PROBLEM_LIB = testing::PROBLEM_ROOT / "lib";
 }}}

@@ -16,6 +16,11 @@ namespace bacs{namespace system{namespace single
     class testing
     {
     public:
+        static const boost::filesystem::path PROBLEM_ROOT;
+        static const boost::filesystem::path PROBLEM_BIN;
+        static const boost::filesystem::path PROBLEM_LIB;
+
+    public:
         explicit testing(const problem::single::task::Callbacks &callbacks);
 
         void test(const problem::single::task::Solution &solution,
@@ -47,6 +52,7 @@ namespace bacs{namespace system{namespace single
                   problem::single::result::TestResult &result);
 
     private:
+        yandex::contest::invoker::ContainerPointer m_container;
         tests m_tests;
         checker m_checker;
         builder_ptr m_builder;
@@ -55,6 +61,5 @@ namespace bacs{namespace system{namespace single
         callback::intermediate m_intermediate_cb;
         problem::single::intermediate::Result m_intermediate;
         problem::single::result::Result m_result;
-        yandex::contest::invoker::ContainerPointer m_container;
     };
 }}}

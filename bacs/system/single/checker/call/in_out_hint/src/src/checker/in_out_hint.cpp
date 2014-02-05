@@ -1,5 +1,7 @@
 #include <bacs/system/single/checker.hpp>
 
+#include <bacs/system/single/testing.hpp>
+
 #include <yandex/contest/invoker/All.hpp>
 
 #include <boost/assert.hpp>
@@ -12,32 +14,16 @@ namespace bacs{namespace system{namespace single
 
     const unistd::access::Id ownerId(1000, 1000);
 
-    const boost::filesystem::path checking_path = "/tmp/checking";
-    const boost::filesystem::path checking_mount_path = checking_path / "package";
-    const boost::filesystem::path checking_log = checking_path / "log";
-
     class checker::impl
     {
     public:
         ContainerPointer container;
     };
 
-    checker::checker(): pimpl(new impl)
+    checker::checker(const yandex::contest::invoker::ContainerPointer &container): pimpl(new impl)
     {
-        ContainerConfig cfg = ContainerConfig::fromEnvironment();
-        if (!cfg.lxcConfig.mount)
-            cfg.lxcConfig.mount = yandex::contest::system::lxc::MountConfig();
-        if (!cfg.lxcConfig.mount->entries)
-            cfg.lxcConfig.mount->entries = std::vector<unistd::MountEntry>();
-        cfg.lxcConfig.mount->entries->push_back(
-            unistd::MountEntry::bindRO(
-                boost::filesystem::current_path(),
-                checking_mount_path));
-        filesystem::Directory checking_dir;
-        checking_dir.path = checking_path;
-        checking_dir.mode = 0555; // rx
-        cfg.filesystemConfig.createFiles.push_back(filesystem::CreateFile(checking_dir));
-        pimpl->container = Container::create(cfg);
+        BOOST_ASSERT(container);
+        pimpl->container = container;
     }
 
     checker::~checker() { /* implicit destructor */ }
@@ -46,6 +32,9 @@ namespace bacs{namespace system{namespace single
         const file_map &test_files,
         const file_map &solution_files)
     {
+        const boost::filesystem::path checking_path = testing::PROBLEM_ROOT;
+        const boost::filesystem::path checking_log = checking_path / "log";
+
         const boost::filesystem::path in = test_files.at("in");
         const boost::filesystem::path out = solution_files.at("stdout");
         const auto hint_iter = test_files.find("out");
@@ -61,8 +50,7 @@ namespace bacs{namespace system{namespace single
         result result_;
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
         // TODO process_group->setResourceLimits()
-        const ProcessPointer process = process_group->createProcess(
-            checking_mount_path / "bin" / "checker");
+        const ProcessPointer process = process_group->createProcess(testing::PROBLEM_BIN / "checker");
         pimpl->container->filesystem().push(in, checking_path / "in", {0, 0}, 0444);
         pimpl->container->filesystem().push(out, checking_path / "out", {0, 0}, 0444);
         if (hint_iter != test_files.end())

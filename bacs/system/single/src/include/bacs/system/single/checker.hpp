@@ -2,6 +2,8 @@
 
 #include <bacs/system/single/common.hpp>
 
+#include <yandex/contest/invoker/Forward.hpp>
+
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 
@@ -31,7 +33,7 @@ namespace bacs{namespace system{namespace single
         };
 
     public:
-        checker();
+        explicit checker(const yandex::contest::invoker::ContainerPointer &container);
         ~checker();
 
         result check(const file_map &test_files, const file_map &solution_files);
