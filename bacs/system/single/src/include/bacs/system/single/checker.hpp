@@ -5,6 +5,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 
+#include <memory>
+
 namespace bacs{namespace system{namespace single
 {
     /// \note must be implemented in problem
@@ -37,6 +39,6 @@ namespace bacs{namespace system{namespace single
     private:
         class impl;
 
-        impl *pimpl;
+        std::unique_ptr<impl> pimpl;
     };
 }}}

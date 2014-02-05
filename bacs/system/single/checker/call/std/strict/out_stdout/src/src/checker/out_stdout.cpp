@@ -5,6 +5,8 @@
 
 namespace bacs{namespace system{namespace single
 {
+    class checker::impl {};
+
     checker::checker() {}
     checker::~checker() {}
 

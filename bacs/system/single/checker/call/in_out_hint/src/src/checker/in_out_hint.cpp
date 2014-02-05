@@ -40,10 +40,7 @@ namespace bacs{namespace system{namespace single
         pimpl->container = Container::create(cfg);
     }
 
-    checker::~checker()
-    {
-        delete pimpl;
-    }
+    checker::~checker() { /* implicit destructor */ }
 
     checker::result checker::check(
         const file_map &test_files,
