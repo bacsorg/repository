@@ -168,4 +168,29 @@ namespace bacs{namespace system{namespace single
             boost::make_filter_iterator(m, full_set.end())
         };
     }
+
+    single::test tests::test(const std::string &test_id)
+    {
+        return single::test(*this, test_id);
+    }
+
+    test::test(tests &tests_, const std::string &test_id):
+        m_tests(&tests_),
+        m_test_id(test_id)
+    {}
+
+    void test::copy(const std::string &data_id, const boost::filesystem::path &path) const
+    {
+        m_tests->copy(m_test_id, data_id, path);
+    }
+
+    boost::filesystem::path test::location(const std::string &data_id) const
+    {
+        return m_tests->location(m_test_id, data_id);
+    }
+
+    std::unordered_set<std::string> test::data_set() const
+    {
+        return m_tests->data_set();
+    }
 }}}

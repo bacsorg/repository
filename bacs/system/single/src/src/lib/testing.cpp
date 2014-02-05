@@ -49,6 +49,7 @@ namespace bacs{namespace system{namespace single
     testing::testing(const problem::single::task::Callbacks &callbacks):
         m_container(Container::create(testing_config(ContainerConfig::fromEnvironment()))),
         m_checker(m_container),
+        m_tester(m_container),
         m_result_cb(callbacks.result())
     {
         if (callbacks.has_intermediate())
@@ -69,6 +70,13 @@ namespace bacs{namespace system{namespace single
         // TODO
         m_result.mutable_system()->set_status(problem::single::result::SystemResult::OK);
         return true;
+    }
+
+    bool testing::build(const problem::single::task::Solution &solution)
+    {
+        m_intermediate.set_state(problem::single::intermediate::BUILDING);
+        send_intermediate();
+        return m_tester.build(solution, *m_result.mutable_build());
     }
 
     bool testing::test(const problem::single::testing::SolutionTesting &testing)
@@ -142,6 +150,17 @@ namespace bacs{namespace system{namespace single
             }
         }
         return true; // note: empty test group is OK
+    }
+
+    bool testing::test(const problem::single::settings::ProcessSettings &settings,
+                       const std::string &test_id,
+                       problem::single::result::TestResult &result)
+    {
+        m_intermediate.set_test_id(test_id);
+        send_intermediate();
+        const bool ret = m_tester.test(settings, m_tests.test(test_id), result);
+        result.set_id(test_id);
+        return ret;
     }
 
     const boost::filesystem::path testing::PROBLEM_ROOT = "/problem_root";

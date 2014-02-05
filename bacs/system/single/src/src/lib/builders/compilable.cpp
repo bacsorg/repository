@@ -10,7 +10,7 @@
 
 namespace bacs{namespace system{namespace single{namespace builders
 {
-    static const boost::filesystem::path solutions_path = "/tmp/solutions";
+    static const boost::filesystem::path solutions_path = "/solutions";
 
     solution_ptr compilable::build(const ContainerPointer &container,
                                    const unistd::access::Id &owner_id,
@@ -21,8 +21,7 @@ namespace bacs{namespace system{namespace single{namespace builders
         const boost::filesystem::path solutions =
             container->filesystem().keepInRoot(solutions_path);
         boost::filesystem::create_directories(solutions);
-        bunsan::tempfile tmpdir = bunsan::tempfile::in_dir(solutions);
-        BOOST_VERIFY(boost::filesystem::create_directory(tmpdir.path()));
+        bunsan::tempfile tmpdir = bunsan::tempfile::directory_in_directory(solutions);
         container->filesystem().setOwnerId(
             solutions_path / tmpdir.path().filename(), owner_id);
         const name_type name_ = name(source);

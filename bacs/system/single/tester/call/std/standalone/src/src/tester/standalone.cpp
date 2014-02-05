@@ -1,9 +1,11 @@
-#include <bacs/system/single/testing.hpp>
+#include <bacs/system/single/tester.hpp>
 
+#include <bacs/system/single/builder.hpp>
 #include <bacs/system/single/error.hpp>
 #include <bacs/system/single/detail/file.hpp>
 #include <bacs/system/single/detail/process.hpp>
 #include <bacs/system/single/detail/result.hpp>
+#include <bacs/system/single/testing.hpp>
 
 #include <bacs/problem/single/resource.pb.h>
 
@@ -12,6 +14,7 @@
 #include <bunsan/filesystem/fstream.hpp>
 #include <bunsan/tempfile.hpp>
 
+#include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
 
 namespace bacs{namespace system{namespace single
@@ -19,48 +22,65 @@ namespace bacs{namespace system{namespace single
     using namespace yandex::contest::invoker;
     namespace unistd = yandex::contest::system::unistd;
 
-    static const unistd::access::Id owner_id{1000, 1000};
+    static const boost::filesystem::path testing_path = "/testing";
 
-    bool testing::build(const problem::single::task::Solution &solution)
+    static const unistd::access::Id OWNER_ID(1000, 1000);
+
+    class tester::impl
     {
-        m_intermediate.set_state(problem::single::intermediate::BUILDING);
-        send_intermediate();
-        m_builder = builder::instance(solution.build().builder());
-        m_solution = m_builder->build(m_container,
-                                      owner_id,
-                                      solution.source(),
-                                      solution.build().resource_limits(),
-                                      *m_result.mutable_build());
-        return static_cast<bool>(m_solution);
+    public:
+        explicit impl(const ContainerPointer &container_):
+            container(container_),
+            checker_(container_) {}
+
+        ContainerPointer container;
+        builder_ptr builder;
+        solution_ptr solution;
+        checker checker_;
+    };
+
+    tester::tester(const yandex::contest::invoker::ContainerPointer &container):
+        pimpl(new impl(container)) {}
+
+    tester::~tester() { /* implicit destructor */ }
+
+    bool tester::build(
+        const problem::single::task::Solution &solution,
+        problem::single::result::BuildResult &result)
+    {
+        pimpl->builder = builder::instance(solution.build().builder());
+        pimpl->solution = pimpl->builder->build(
+            pimpl->container,
+            OWNER_ID,
+            solution.source(),
+            solution.build().resource_limits(),
+            result);
+        return static_cast<bool>(pimpl->solution);
     }
 
-    static const boost::filesystem::path testing_path = "/tmp/testing";
-
-    bool testing::test(const problem::single::settings::ProcessSettings &settings,
-                       const std::string &test_id,
-                       problem::single::result::TestResult &result)
+    bool tester::test(const problem::single::settings::ProcessSettings &settings,
+                      const single::test &test_,
+                      problem::single::result::TestResult &result)
     {
-        m_intermediate.set_test_id(test_id);
-        send_intermediate();
         // preinitialization
-        const boost::filesystem::path container_testing_path = m_container->filesystem().keepInRoot(testing_path);
+        const boost::filesystem::path container_testing_path =
+            pimpl->container->filesystem().keepInRoot(testing_path);
         boost::filesystem::create_directories(container_testing_path);
         // initialize working directory
-        const bunsan::tempfile tmpdir = bunsan::tempfile::in_dir(container_testing_path);
-        BOOST_VERIFY(boost::filesystem::create_directory(tmpdir.path()));
+        const bunsan::tempfile tmpdir =
+            bunsan::tempfile::directory_in_directory(container_testing_path);
         const boost::filesystem::path current_path = testing_path / tmpdir.path().filename();
-        m_container->filesystem().setOwnerId(current_path, owner_id);
-        m_container->filesystem().setMode(current_path, 0500);
+        pimpl->container->filesystem().setOwnerId(current_path, OWNER_ID);
+        pimpl->container->filesystem().setMode(current_path, 0500);
         // initialize process
-        const ProcessGroupPointer process_group = m_container->createProcessGroup();
-        const ProcessPointer process = m_solution->create(process_group, settings.execution().arguments());
+        const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
+        const ProcessPointer process = pimpl->solution->create(
+            process_group, settings.execution().arguments());
         detail::process::setup(settings.resource_limits(), process_group, process);
         // files
         file_map test_files, solution_files;
-        for (const std::string &data_id: m_tests.data_set())
-        {
-            test_files[data_id] = m_tests.location(test_id, data_id);
-        }
+        for (const std::string &data_id: test_.data_set())
+            test_files[data_id] = test_.location(data_id);
         struct receive_type
         {
             std::string id;
@@ -73,24 +93,27 @@ namespace bacs{namespace system{namespace single
             if (solution_files.find(file.id()) != solution_files.end())
                 BOOST_THROW_EXCEPTION(error() << error::message("Duplicate file ids."));
             const boost::filesystem::path location = solution_files[file.id()] =
-                "/" / current_path / (file.has_path() ?
-                    detail::file::to_path(file.path()).filename() /* note: strip to filename */ : boost::filesystem::unique_path());
-            const boost::filesystem::path path = m_container->filesystem().keepInRoot(location);
+                "/" / current_path / (
+                    file.has_path() ?
+                        detail::file::to_path(file.path()).filename() /* note: strip to filename */ :
+                        boost::filesystem::unique_path());
+            const boost::filesystem::path path = pimpl->container->filesystem().keepInRoot(location);
             if (file.has_init())
-                m_tests.copy(test_id, file.init(), path);
+                test_.copy(file.init(), path);
             else
                 detail::file::touch(path);
-            m_container->filesystem().setOwnerId(location, owner_id);
-            m_container->filesystem().setMode(location, detail::file::mode(file.permissions()) & 0700);
+            pimpl->container->filesystem().setOwnerId(location, OWNER_ID);
+            pimpl->container->filesystem().setMode(location, detail::file::mode(file.permissions()) & 0700);
             if (file.has_receive())
                 receive.push_back({file.id(), path, file.receive()});
         }
         // execution
-        process->setOwnerId(owner_id);
+        process->setOwnerId(OWNER_ID);
         // note: ignore current_path from settings.execution()
         process->setCurrentPath(current_path);
         // note: arguments is already set
-        for (const problem::single::settings::Execution::Redirection &redirection: settings.execution().redirections())
+        for (const problem::single::settings::Execution::Redirection &redirection:
+             settings.execution().redirections())
         {
             const auto iter = solution_files.find(redirection.file_id());
             if (iter == solution_files.end())
@@ -113,7 +136,6 @@ namespace bacs{namespace system{namespace single
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         // fill result
-        result.set_id(test_id);
         const bool execution_success = detail::result::parse(
             process_group_result, process_result, *result.mutable_execution());
         for (const receive_type &r: receive)
@@ -148,8 +170,8 @@ namespace bacs{namespace system{namespace single
         {
             // note: solution_files paths are relative to container's root
             for (file_map::value_type &data_id_path: solution_files)
-                data_id_path.second = m_container->filesystem().keepInRoot(data_id_path.second);
-            const checker::result checker_result = m_checker.check(test_files, solution_files);
+                data_id_path.second = pimpl->container->filesystem().keepInRoot(data_id_path.second);
+            const checker::result checker_result = pimpl->checker_.check(test_files, solution_files);
             // fill checker result
             problem::single::result::Judge &judge = *result.mutable_judge();
             switch (checker_result.status)

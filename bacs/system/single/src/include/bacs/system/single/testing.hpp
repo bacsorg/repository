@@ -1,8 +1,8 @@
 #pragma once
 
-#include <bacs/system/single/builder.hpp>
 #include <bacs/system/single/callback.hpp>
 #include <bacs/system/single/checker.hpp>
+#include <bacs/system/single/tester.hpp>
 #include <bacs/system/single/tests.hpp>
 
 #include <bacs/problem/single/result.pb.h>
@@ -55,8 +55,7 @@ namespace bacs{namespace system{namespace single
         yandex::contest::invoker::ContainerPointer m_container;
         tests m_tests;
         checker m_checker;
-        builder_ptr m_builder;
-        solution_ptr m_solution;
+        tester m_tester;
         callback::result m_result_cb;
         callback::intermediate m_intermediate_cb;
         problem::single::intermediate::Result m_intermediate;
