@@ -1,7 +1,7 @@
 #include "gcc.hpp"
 
-#include <boost/regex.hpp>
 #include <boost/assert.hpp>
+#include <boost/regex.hpp>
 
 #include <unordered_map>
 

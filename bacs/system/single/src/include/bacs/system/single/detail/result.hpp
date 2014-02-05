@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bacs/problem/single/result.pb.h"
+#include <bacs/problem/single/result.pb.h>
 
-#include "yandex/contest/invoker/ProcessGroup.hpp"
-#include "yandex/contest/invoker/Process.hpp"
+#include <yandex/contest/invoker/Process.hpp>
+#include <yandex/contest/invoker/ProcessGroup.hpp>
 
 namespace bacs{namespace system{namespace single{namespace detail{namespace result
 {

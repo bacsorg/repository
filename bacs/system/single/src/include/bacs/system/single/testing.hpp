@@ -1,15 +1,15 @@
 #pragma once
 
-#include "bacs/system/single/callback.hpp"
-#include "bacs/system/single/tests.hpp"
-#include "bacs/system/single/checker.hpp"
-#include "bacs/system/single/builder.hpp"
+#include <bacs/system/single/builder.hpp>
+#include <bacs/system/single/callback.hpp>
+#include <bacs/system/single/checker.hpp>
+#include <bacs/system/single/tests.hpp>
 
-#include "bacs/problem/single/settings.pb.h"
-#include "bacs/problem/single/testing.pb.h"
-#include "bacs/problem/single/result.pb.h"
+#include <bacs/problem/single/result.pb.h>
+#include <bacs/problem/single/settings.pb.h>
+#include <bacs/problem/single/testing.pb.h>
 
-#include "yandex/contest/invoker/Forward.hpp"
+#include <yandex/contest/invoker/Forward.hpp>
 
 namespace bacs{namespace system{namespace single
 {

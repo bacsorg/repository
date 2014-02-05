@@ -1,14 +1,14 @@
 #pragma once
 
-#include "bacs/system/single/error.hpp"
+#include <bacs/system/single/error.hpp>
 
-#include "bacs/problem/single/task.pb.h"
-#include "bacs/problem/single/result.pb.h"
+#include <bacs/problem/single/result.pb.h>
+#include <bacs/problem/single/task.pb.h>
 
-#include "bunsan/factory_helper.hpp"
+#include <yandex/contest/invoker/Forward.hpp>
+#include <yandex/contest/system/unistd/access/Id.hpp>
 
-#include "yandex/contest/invoker/Forward.hpp"
-#include "yandex/contest/system/unistd/access/Id.hpp"
+#include <bunsan/factory_helper.hpp>
 
 #include <boost/noncopyable.hpp>
 

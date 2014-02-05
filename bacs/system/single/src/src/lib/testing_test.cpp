@@ -1,15 +1,16 @@
-#include "bacs/system/single/testing.hpp"
-#include "bacs/system/single/error.hpp"
-#include "bacs/system/single/detail/process.hpp"
-#include "bacs/system/single/detail/file.hpp"
-#include "bacs/system/single/detail/result.hpp"
+#include <bacs/system/single/testing.hpp>
 
-#include "bacs/problem/single/resource.pb.h"
+#include <bacs/system/single/error.hpp>
+#include <bacs/system/single/detail/file.hpp>
+#include <bacs/system/single/detail/process.hpp>
+#include <bacs/system/single/detail/result.hpp>
 
-#include "bunsan/filesystem/fstream.hpp"
-#include "bunsan/tempfile.hpp"
+#include <bacs/problem/single/resource.pb.h>
 
-#include "yandex/contest/invoker/All.hpp"
+#include <yandex/contest/invoker/All.hpp>
+
+#include <bunsan/filesystem/fstream.hpp>
+#include <bunsan/tempfile.hpp>
 
 #include <boost/filesystem/operations.hpp>
 

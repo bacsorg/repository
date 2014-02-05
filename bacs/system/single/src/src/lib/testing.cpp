@@ -1,6 +1,6 @@
-#include "bacs/system/single/testing.hpp"
+#include <bacs/system/single/testing.hpp>
 
-#include "yandex/contest/invoker/All.hpp"
+#include <yandex/contest/invoker/All.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 

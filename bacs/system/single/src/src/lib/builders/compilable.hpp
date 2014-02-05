@@ -1,10 +1,10 @@
 #pragma once
 
-#include "bacs/system/single/builder.hpp"
+#include <bacs/system/single/builder.hpp>
 
-#include "bunsan/tempfile.hpp"
+#include <yandex/contest/invoker/All.hpp>
 
-#include "yandex/contest/invoker/All.hpp"
+#include <bunsan/tempfile.hpp>
 
 namespace bacs{namespace system{namespace single{namespace builders
 {

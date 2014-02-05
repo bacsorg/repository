@@ -1,14 +1,14 @@
-#include "bacs/system/single/testing.hpp"
-#include "bacs/system/single/error.hpp"
+#include <bacs/system/single/error.hpp>
+#include <bacs/system/single/testing.hpp>
 
-#include "bacs/problem/single/task.pb.h"
+#include <bacs/problem/single/task.pb.h>
 
-#include "yandex/contest/TypeInfo.hpp"
-#include "yandex/contest/system/Trace.hpp"
-
-#include <iostream>
+#include <yandex/contest/system/Trace.hpp>
+#include <yandex/contest/TypeInfo.hpp>
 
 #include <boost/assert.hpp>
+
+#include <iostream>
 
 using namespace bacs::system::single;
 

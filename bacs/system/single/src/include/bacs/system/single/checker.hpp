@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bacs/system/single/common.hpp"
+#include <bacs/system/single/common.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>

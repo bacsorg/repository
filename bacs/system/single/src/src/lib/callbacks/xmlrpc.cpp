@@ -1,6 +1,6 @@
 #include "xmlrpc.hpp"
 
-#include "bunsan/enable_error_info.hpp"
+#include <bunsan/enable_error_info.hpp>
 
 #define BUNSAN_EXCEPTIONS_WRAP_END_XMLRPC() \
     BUNSAN_EXCEPTIONS_WRAP_END_EXCEPT(::girerr::error)

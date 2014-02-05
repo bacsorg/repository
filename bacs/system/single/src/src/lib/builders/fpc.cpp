@@ -1,7 +1,7 @@
 #include "fpc.hpp"
 
-#include <boost/regex.hpp>
 #include <boost/assert.hpp>
+#include <boost/regex.hpp>
 
 namespace bacs{namespace system{namespace single{namespace builders
 {

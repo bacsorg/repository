@@ -1,21 +1,21 @@
 #pragma once
 
-#include "bacs/system/single/error.hpp"
+#include <bacs/system/single/error.hpp>
 
-#include "bacs/problem/single/task.pb.h"
-#include "bacs/problem/single/result.pb.h"
-#include "bacs/problem/single/intermediate.pb.h"
+#include <bacs/problem/single/intermediate.pb.h>
+#include <bacs/problem/single/result.pb.h>
+#include <bacs/problem/single/task.pb.h>
 
-#include "bunsan/factory_helper.hpp"
+#include <bunsan/factory_helper.hpp>
 
-#include <boost/noncopyable.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
 
+#include <functional>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
-#include <functional>
 
 namespace bacs{namespace system{namespace single{namespace callback
 {

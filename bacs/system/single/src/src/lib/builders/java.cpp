@@ -1,8 +1,8 @@
 #include "java.hpp"
 
-#include <boost/scope_exit.hpp>
-#include <boost/regex.hpp>
 #include <boost/assert.hpp>
+#include <boost/regex.hpp>
+#include <boost/scope_exit.hpp>
 
 namespace bacs{namespace system{namespace single{namespace builders
 {
