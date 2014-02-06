@@ -152,7 +152,7 @@ namespace bacs{namespace system{namespace single
         // execute
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
-        const Process::Result interactor_result = process->result();
+        const Process::Result interactor_result = interactor->result();
         const Process::Result pipectl_result = pipectl->result();
         // fill result
         const bool execution_success = detail::result::parse(
