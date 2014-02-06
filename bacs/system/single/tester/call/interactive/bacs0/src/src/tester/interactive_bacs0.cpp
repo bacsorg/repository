@@ -237,37 +237,7 @@ namespace bacs{namespace system{namespace single
                 break;
             }
         }
-        if (execution_success)
-        {
-            // note: solution_files paths are relative to container's root
-            for (file_map::value_type &data_id_path: solution_files)
-                data_id_path.second = pimpl->container->filesystem().keepInRoot(data_id_path.second);
-            const checker::result checker_result = pimpl->checker_.check(test_files, solution_files);
-            // fill checker result
-            problem::single::result::Judge &judge = *result.mutable_judge();
-            switch (checker_result.status)
-            {
-            case checker::result::OK:
-                judge.set_status(problem::single::result::Judge::OK);
-                break;
-            case checker::result::WRONG_ANSWER:
-                judge.set_status(problem::single::result::Judge::WRONG_ANSWER);
-                break;
-            case checker::result::PRESENTATION_ERROR:
-                judge.set_status(problem::single::result::Judge::PRESENTATION_ERROR);
-                break;
-            case checker::result::FAIL_TEST:
-                judge.set_status(problem::single::result::Judge::FAIL_TEST);
-                break;
-            case checker::result::FAILED:
-                judge.set_status(problem::single::result::Judge::FAILED);
-                break;
-            }
-            // TODO change protobuffers to appropriate format
-            if (checker_result.message)
-                judge.set_message(checker_result.message.get());
-            // TODO execution
-        }
+        // TODO checker
         return result.execution().status() == problem::single::result::Execution::OK &&
             result.judge().status() == problem::single::result::Judge::OK;
     }
