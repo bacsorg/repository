@@ -17,8 +17,7 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace resu
         switch (process_group_result.completionStatus)
         {
         case ProcessGroup::Result::CompletionStatus::OK:
-            result.set_status(problem::single::result::Execution::OK);
-            break;
+            // it may happen if Process::terminateGroupOnCrash is not set
         case ProcessGroup::Result::CompletionStatus::ABNORMAL_EXIT:
             switch (process_result.completionStatus)
             {
