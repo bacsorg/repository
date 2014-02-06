@@ -1,5 +1,6 @@
 #include <bacs/system/single/checker.hpp>
 
+#include <bacs/system/single/detail/result.hpp>
 #include <bacs/system/single/testing.hpp>
 
 #include <yandex/contest/invoker/All.hpp>
@@ -28,9 +29,10 @@ namespace bacs{namespace system{namespace single
 
     checker::~checker() { /* implicit destructor */ }
 
-    checker::result checker::check(
+    bool checker::check(
         const file_map &test_files,
-        const file_map &solution_files)
+        const file_map &solution_files,
+        problem::single::result::Judge &result)
     {
         const boost::filesystem::path checking_path = testing::PROBLEM_ROOT;
         const boost::filesystem::path checking_log = checking_path / "log";
@@ -47,7 +49,6 @@ namespace bacs{namespace system{namespace single
             (hint_iter != test_files.end() && test_files.size() == 2),
             "keys(test_files) == {'in', 'out'} || keys(test_files) == {'in'}"
         );
-        result result_;
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
         // TODO process_group->setResourceLimits()
         const ProcessPointer process = process_group->createProcess(testing::PROBLEM_BIN / "checker");
@@ -67,58 +68,50 @@ namespace bacs{namespace system{namespace single
         const ProcessGroup::Result process_group_result =
             process_group->synchronizedCall();
         const Process::Result process_result = process->result();
-        switch (process_group_result.completionStatus)
+        const bool success = detail::result::parse(
+            process_group_result,
+            process_result,
+            *result.mutable_utilities()->mutable_checker()->mutable_execution()
+        );
+        const problem::single::result::Execution &checker_execution =
+            result.utilities().checker().execution();
+        switch (checker_execution.status())
         {
-        case ProcessGroup::Result::CompletionStatus::OK:
-        case ProcessGroup::Result::CompletionStatus::ABNORMAL_EXIT:
-            switch (process_result.completionStatus)
+        case problem::single::result::Execution::OK:
+            result.set_status(problem::single::result::Judge::OK);
+            break;
+        case problem::single::result::Execution::ABNORMAL_EXIT:
+            if (checker_execution.has_exit_status())
             {
-            case Process::Result::CompletionStatus::OK:
-            case Process::Result::CompletionStatus::ABNORMAL_EXIT:
-                if (process_result.exitStatus)
+                switch (checker_execution.exit_status())
                 {
-                    // FIXME don't like hardcoded exit statuses
-                    switch (process_result.exitStatus.get())
-                    {
-                    case 0:
-                        result_.status = checker::result::OK;
-                        break;
-                    case 2:
-                    case 5:
-                        result_.status = checker::result::WRONG_ANSWER;
-                        break;
-                    case 4:
-                        result_.status = checker::result::PRESENTATION_ERROR;
-                        break;
-                    default:
-                        result_.status = checker::result::FAILED;
-                    }
-                    // TODO load message
-                    // TODO load log
+                case 0:
+                    result.set_status(problem::single::result::Judge::OK);
+                    break;
+                case 2:
+                case 5:
+                    result.set_status(problem::single::result::Judge::WRONG_ANSWER);
+                    break;
+                case 4:
+                    result.set_status(problem::single::result::Judge::PRESENTATION_ERROR);
+                    break;
+                default:
+                    result.set_status(problem::single::result::Judge::FAILED);
                 }
-                else
-                {
-                    result_.status = checker::result::FAILED;
-                    // TODO load log
-                }
-                break;
-            case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
-            case Process::Result::CompletionStatus::MEMORY_LIMIT_EXCEEDED:
-            case Process::Result::CompletionStatus::TIME_LIMIT_EXCEEDED:
-            case Process::Result::CompletionStatus::SYSTEM_TIME_LIMIT_EXCEEDED:
-            case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
-            case Process::Result::CompletionStatus::OUTPUT_LIMIT_EXCEEDED:
-            case Process::Result::CompletionStatus::START_FAILED:
-            case Process::Result::CompletionStatus::STOPPED:
-                result_.status = checker::result::FAILED;
-                break;
+            }
+            else
+            {
+                result.set_status(problem::single::result::Judge::FAILED);
             }
             break;
-        case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
-        case ProcessGroup::Result::CompletionStatus::STOPPED:
-            result_.status = checker::result::FAILED;
+        case problem::single::result::Execution::MEMORY_LIMIT_EXCEEDED:
+        case problem::single::result::Execution::TIME_LIMIT_EXCEEDED:
+        case problem::single::result::Execution::OUTPUT_LIMIT_EXCEEDED:
+        case problem::single::result::Execution::REAL_TIME_LIMIT_EXCEEDED:
+        case problem::single::result::Execution::FAILED:
+            result.set_status(problem::single::result::Judge::FAILED);
             break;
         }
-        return result_;
+        return result.status() == problem::single::result::Judge::OK;
     }
 }}}

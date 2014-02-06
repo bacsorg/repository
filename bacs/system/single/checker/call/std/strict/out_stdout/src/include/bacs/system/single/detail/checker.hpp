@@ -4,8 +4,6 @@
 
 namespace bacs{namespace system{namespace single{namespace detail{namespace checker
 {
-    typedef single::checker::result result;
-
-    single::checker::result::status_type equal(std::istream &out, std::istream &hint);
-    single::checker::result::status_type seek_eof(std::istream &in);
+    problem::single::result::Judge::Status equal(std::istream &out, std::istream &hint);
+    problem::single::result::Judge::Status seek_eof(std::istream &in);
 }}}}}

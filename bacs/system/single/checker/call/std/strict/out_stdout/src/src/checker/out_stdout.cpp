@@ -10,16 +10,18 @@ namespace bacs{namespace system{namespace single
     checker::checker(const yandex::contest::invoker::ContainerPointer &/*container*/) {}
     checker::~checker() {}
 
-    checker::result checker::check(const file_map &test_files, const file_map &solution_files)
+    bool checker::check(
+        const file_map &test_files,
+        const file_map &solution_files,
+        problem::single::result::Judge &result)
     {
-        result result_;
         BUNSAN_EXCEPTIONS_WRAP_BEGIN()
         {
             bunsan::filesystem::ifstream hint(test_files.at("out"), std::ios::binary),
                 out(solution_files.at("stdout"), std::ios::binary);
-            result_.status = detail::checker::equal(out, hint);
+            result.set_status(detail::checker::equal(out, hint));
         }
         BUNSAN_EXCEPTIONS_WRAP_END()
-        return result_;
+        return result.status() == problem::single::result::Judge::OK;
     }
 }}}

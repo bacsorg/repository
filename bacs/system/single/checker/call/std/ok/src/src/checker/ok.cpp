@@ -7,8 +7,12 @@ namespace bacs{namespace system{namespace single
     checker::checker(const yandex::contest::invoker::ContainerPointer &/*container*/) {}
     checker::~checker() {}
 
-    checker::result checker::check(const file_map &/*test_files*/, const file_map &/*solution_files*/)
+    bool checker::check(
+        const file_map &/*test_files*/,
+        const file_map &/*solution_files*/,
+        problem::single::result::Judge &result)
     {
-        return result();
+        result.set_status(problem::single::result::Judge::OK);
+        return true;
     }
 }}}
