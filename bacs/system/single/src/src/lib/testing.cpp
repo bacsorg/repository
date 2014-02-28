@@ -101,8 +101,8 @@ namespace bacs{namespace system{namespace single
     {
         m_intermediate.set_state(problem::single::intermediate::TESTING);
         // TODO test group dependencies
-        for (const problem::single::testing::TestGroup &test_group: testing.test_groups())
-            test(test_group, *result.add_test_groups());
+        for (const problem::single::testing::TestGroup &test_group: testing.test_group())
+            test(test_group, *result.add_test_group());
     }
 
     bool testing::test(const problem::single::testing::TestGroup &test_group,
@@ -137,7 +137,7 @@ namespace bacs{namespace system{namespace single
         std::sort(test_order.begin(), test_order.end(), less);
         for (const std::string &test_id: test_order)
         {
-            const bool ret = test(settings.process(), test_id, *result.add_tests());
+            const bool ret = test(settings.process(), test_id, *result.add_test());
             switch (settings.run().algorithm())
             {
             case problem::single::settings::Run::ALL:

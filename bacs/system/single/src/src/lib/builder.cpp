@@ -7,8 +7,8 @@ namespace bacs{namespace system{namespace single
     builder_ptr builder::instance(const problem::single::task::Builder &config)
     {
         return instance(config.type(), std::vector<std::string>{
-            begin(config.arguments()),
-            end(config.arguments())
+            begin(config.argument()),
+            end(config.argument())
         });
     }
 }}}

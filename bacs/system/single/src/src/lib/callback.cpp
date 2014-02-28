@@ -7,8 +7,8 @@ namespace bacs{namespace system{namespace single{namespace callback
     base_ptr base::instance(const problem::single::task::Callback &config)
     {
         const std::vector<std::string> arguments(
-            config.arguments().begin(),
-            config.arguments().end());
+            config.argument().begin(),
+            config.argument().end());
         return instance(config.type(), arguments);
     }
 }}}}

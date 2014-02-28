@@ -77,7 +77,7 @@ namespace bacs{namespace system{namespace single
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
 
         const ProcessPointer process = pimpl->solution->create(
-            process_group, settings.execution().arguments());
+            process_group, settings.execution().argument());
         detail::process::setup(settings.resource_limits(), process_group, process);
         process->setTerminateGroupOnCrash(false);
 

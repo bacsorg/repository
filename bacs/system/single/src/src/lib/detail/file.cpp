@@ -11,7 +11,7 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace file
         boost::filesystem::path p;
         if (path.has_root())
             p = path.root();
-        for (const std::string &element: path.elements())
+        for (const std::string &element: path.element())
             p /= element;
         return p;
     }

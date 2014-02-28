@@ -75,7 +75,7 @@ namespace bacs{namespace system{namespace single
         // initialize process
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
         const ProcessPointer process = pimpl->solution->create(
-            process_group, settings.execution().arguments());
+            process_group, settings.execution().argument());
         detail::process::setup(settings.resource_limits(), process_group, process);
         // files
         file_map test_files, solution_files;
@@ -88,7 +88,7 @@ namespace bacs{namespace system{namespace single
             problem::single::settings::File::Range range;
         };
         std::vector<receive_type> receive;
-        for (const problem::single::settings::File &file: settings.files())
+        for (const problem::single::settings::File &file: settings.file())
         {
             if (solution_files.find(file.id()) != solution_files.end())
                 BOOST_THROW_EXCEPTION(error() << error::message("Duplicate file ids."));
@@ -103,7 +103,7 @@ namespace bacs{namespace system{namespace single
             else
                 detail::file::touch(path);
             pimpl->container->filesystem().setOwnerId(location, OWNER_ID);
-            pimpl->container->filesystem().setMode(location, detail::file::mode(file.permissions()) & 0700);
+            pimpl->container->filesystem().setMode(location, detail::file::mode(file.permission()) & 0700);
             if (file.has_receive())
                 receive.push_back({file.id(), path, file.receive()});
         }
@@ -113,7 +113,7 @@ namespace bacs{namespace system{namespace single
         process->setCurrentPath(current_path);
         // note: arguments is already set
         for (const problem::single::settings::Execution::Redirection &redirection:
-             settings.execution().redirections())
+             settings.execution().redirection())
         {
             const auto iter = solution_files.find(redirection.file_id());
             if (iter == solution_files.end())
@@ -141,7 +141,7 @@ namespace bacs{namespace system{namespace single
         for (const receive_type &r: receive)
         {
             BOOST_ASSERT(boost::filesystem::exists(r.path));
-            problem::single::result::File &file = *result.add_files();
+            problem::single::result::File &file = *result.add_file();
             file.set_id(r.id);
             std::string &data = *file.mutable_data();
             bunsan::filesystem::ifstream fin(r.path, std::ios::binary);

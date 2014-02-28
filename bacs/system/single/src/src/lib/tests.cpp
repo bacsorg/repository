@@ -68,7 +68,7 @@ namespace bacs{namespace system{namespace single
                 int flags(const problem::single::testing::WildcardQuery &query)
                 {
                     int flags_ = 0;
-                    for (const int flag: query.flags())
+                    for (const int flag: query.flag())
                     {
                         switch (static_cast<problem::single::testing::WildcardQuery::Flag>(flag))
                         {
@@ -101,7 +101,7 @@ namespace bacs{namespace system{namespace single
                     const problem::single::testing::RegexQuery &query)
                 {
                     boost::regex_constants::syntax_option_type flags_ = boost::regex_constants::normal;
-                    for (const int flag: query.flags())
+                    for (const int flag: query.flag())
                     {
                         switch (static_cast<problem::single::testing::RegexQuery::Flag>(flag))
                         {
