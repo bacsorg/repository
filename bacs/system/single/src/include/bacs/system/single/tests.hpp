@@ -26,7 +26,8 @@ namespace bacs{namespace system{namespace single
         void copy(const std::string &test_id, const std::string &data_id,
                   const boost::filesystem::path &path);
 
-        boost::filesystem::path location(const std::string &test_id, const std::string &data_id);
+        boost::filesystem::path location(
+            const std::string &test_id, const std::string &data_id);
 
         std::unordered_set<std::string> data_set();
 
@@ -34,7 +35,8 @@ namespace bacs{namespace system{namespace single
 
         /// \note implemented
         std::unordered_set<std::string> test_set(
-            const google::protobuf::RepeatedPtrField<problem::single::testing::TestQuery> &test_query);
+            const google::protobuf::RepeatedPtrField<
+                problem::single::testing::TestQuery> &test_query);
 
         /// \note implemented
         single::test test(const std::string &test_id);
@@ -59,7 +61,9 @@ namespace bacs{namespace system{namespace single
 
         test(tests &tests_, const std::string &test_id);
 
-        void copy(const std::string &data_id, const boost::filesystem::path &path) const;
+        void copy(
+            const std::string &data_id,
+            const boost::filesystem::path &path) const;
 
         boost::filesystem::path location(const std::string &data_id) const;
 

@@ -22,34 +22,42 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace resu
             switch (process_result.completionStatus)
             {
             case Process::Result::CompletionStatus::OK:
-                result.set_status(problem::single::result::Execution::OK);
+                result.set_status(
+                    problem::single::result::Execution::OK);
                 break;
             case Process::Result::CompletionStatus::ABNORMAL_EXIT:
-                result.set_status(problem::single::result::Execution::ABNORMAL_EXIT);
+                result.set_status(
+                    problem::single::result::Execution::ABNORMAL_EXIT);
                 break;
             case Process::Result::CompletionStatus::MEMORY_LIMIT_EXCEEDED:
-                result.set_status(problem::single::result::Execution::MEMORY_LIMIT_EXCEEDED);
+                result.set_status(
+                    problem::single::result::Execution::MEMORY_LIMIT_EXCEEDED);
                 break;
             case Process::Result::CompletionStatus::TIME_LIMIT_EXCEEDED:
-                result.set_status(problem::single::result::Execution::TIME_LIMIT_EXCEEDED);
+                result.set_status(
+                    problem::single::result::Execution::TIME_LIMIT_EXCEEDED);
                 break;
             case Process::Result::CompletionStatus::OUTPUT_LIMIT_EXCEEDED:
-                result.set_status(problem::single::result::Execution::OUTPUT_LIMIT_EXCEEDED);
+                result.set_status(
+                    problem::single::result::Execution::OUTPUT_LIMIT_EXCEEDED);
                 break;
             case Process::Result::CompletionStatus::USER_TIME_LIMIT_EXCEEDED:
             case Process::Result::CompletionStatus::SYSTEM_TIME_LIMIT_EXCEEDED:
             case Process::Result::CompletionStatus::TERMINATED_BY_SYSTEM:
             case Process::Result::CompletionStatus::START_FAILED:
             case Process::Result::CompletionStatus::STOPPED:
-                result.set_status(problem::single::result::Execution::FAILED);
+                result.set_status(
+                    problem::single::result::Execution::FAILED);
                 break;
             }
             break;
         case ProcessGroup::Result::CompletionStatus::REAL_TIME_LIMIT_EXCEEDED:
-            result.set_status(problem::single::result::Execution::REAL_TIME_LIMIT_EXCEEDED);
+            result.set_status(
+                problem::single::result::Execution::REAL_TIME_LIMIT_EXCEEDED);
             break;
         case ProcessGroup::Result::CompletionStatus::STOPPED:
-            result.set_status(problem::single::result::Execution::FAILED);
+            result.set_status(
+                problem::single::result::Execution::FAILED);
             break;
         }
         if (process_result.exitStatus)
@@ -57,16 +65,22 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace resu
         if (process_result.termSig)
             result.set_term_sig(process_result.termSig.get());
         {
-            problem::single::ResourceUsage &resource_usage = *result.mutable_resource_usage();
-            resource_usage.set_time_usage_millis(std::chrono::duration_cast<std::chrono::milliseconds>(
-                process_result.resourceUsage.userTimeUsage).count());
-            resource_usage.set_memory_usage_bytes(process_result.resourceUsage.memoryUsageBytes);
+            problem::single::ResourceUsage &resource_usage =
+                *result.mutable_resource_usage();
+            resource_usage.set_time_usage_millis(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    process_result.resourceUsage.userTimeUsage).count());
+            resource_usage.set_memory_usage_bytes(
+                process_result.resourceUsage.memoryUsageBytes);
         }
         // full: dump all results here
         {
             boost::property_tree::ptree ptree;
-            ptree.put_child("processGroupResult", bunsan::config::save<boost::property_tree::ptree>(process_group_result));
-            ptree.put_child("processResult", bunsan::config::save<boost::property_tree::ptree>(process_result));
+            ptree.put_child("processGroupResult",
+                bunsan::config::save<boost::property_tree::ptree>(
+                    process_group_result));
+            ptree.put_child("processResult",
+                bunsan::config::save<boost::property_tree::ptree>(process_result));
             std::ostringstream buf;
             boost::property_tree::write_json(buf, ptree);
             result.set_full(buf.str());

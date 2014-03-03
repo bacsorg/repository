@@ -17,7 +17,8 @@ namespace bacs{namespace system{namespace single
     class checker: private boost::noncopyable
     {
     public:
-        explicit checker(const yandex::contest::invoker::ContainerPointer &container);
+        explicit checker(
+            const yandex::contest::invoker::ContainerPointer &container);
         ~checker();
 
         bool check(

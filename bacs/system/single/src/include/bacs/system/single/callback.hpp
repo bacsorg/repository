@@ -55,7 +55,10 @@ namespace bacs{namespace system{namespace single{namespace callback
         {
             typedef std::iterator_traits<Iter> traits;
             typedef typename traits::value_type value_type;
-            static_assert(sizeof(value_type) == sizeof(data_type::value_type), "Sizes should be equal.");
+            static_assert(
+                sizeof(value_type) == sizeof(data_type::value_type),
+                "Sizes should be equal."
+            );
             const std::function<data_type::value_type (const value_type)> to_uc =
                 [](const value_type c)
                 {

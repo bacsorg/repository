@@ -20,7 +20,8 @@ namespace bacs{namespace system{namespace single
     class tester: private boost::noncopyable
     {
     public:
-        explicit tester(const yandex::contest::invoker::ContainerPointer &container);
+        explicit tester(
+            const yandex::contest::invoker::ContainerPointer &container);
         ~tester();
 
         bool build(

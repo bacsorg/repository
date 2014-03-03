@@ -29,14 +29,16 @@ namespace bacs{namespace system{namespace single
         dir.path = testing::PROBLEM_ROOT;
         config.filesystemConfig.createFiles.push_back(filesystem::CreateFile(dir));
 
-        const boost::filesystem::path bin = boost::filesystem::current_path() / "bin";
+        const boost::filesystem::path bin =
+            boost::filesystem::current_path() / "bin";
         dir.path = testing::PROBLEM_BIN;
         config.filesystemConfig.createFiles.push_back(filesystem::CreateFile(dir));
         if (boost::filesystem::exists(bin))
             config.lxcConfig.mount->entries->push_back(
                 unistd::MountEntry::bindRO(bin, testing::PROBLEM_BIN));
 
-        const boost::filesystem::path lib = boost::filesystem::current_path() / "lib";
+        const boost::filesystem::path lib =
+            boost::filesystem::current_path() / "lib";
         dir.path = testing::PROBLEM_LIB;
         config.filesystemConfig.createFiles.push_back(filesystem::CreateFile(dir));
         if (boost::filesystem::exists(lib))
@@ -47,7 +49,8 @@ namespace bacs{namespace system{namespace single
     }
 
     testing::testing(const problem::single::task::Callbacks &callbacks):
-        m_container(Container::create(testing_config(ContainerConfig::fromEnvironment()))),
+        m_container(Container::create(testing_config(
+            ContainerConfig::fromEnvironment()))),
         m_checker(m_container),
         m_tester(m_container),
         m_result_cb(callbacks.result())
@@ -68,7 +71,8 @@ namespace bacs{namespace system{namespace single
     bool testing::check_hash()
     {
         // TODO
-        m_result.mutable_system()->set_status(problem::single::result::SystemResult::OK);
+        m_result.mutable_system()->set_status(
+            problem::single::result::SystemResult::OK);
         return true;
     }
 
@@ -101,8 +105,11 @@ namespace bacs{namespace system{namespace single
     {
         m_intermediate.set_state(problem::single::intermediate::TESTING);
         // TODO test group dependencies
-        for (const problem::single::testing::TestGroup &test_group: testing.test_group())
+        for (const problem::single::testing::TestGroup &test_group:
+                testing.test_group())
+        {
             test(test_group, *result.add_test_group());
+        }
     }
 
     bool testing::test(const problem::single::testing::TestGroup &test_group,
@@ -110,8 +117,10 @@ namespace bacs{namespace system{namespace single
     {
         m_intermediate.set_test_group_id(test_group.id());
         result.set_id(test_group.id());
-        const problem::single::settings::TestGroupSettings &settings = test_group.settings();
-        const std::unordered_set<std::string> test_set = m_tests.test_set(test_group.test_set());
+        const problem::single::settings::TestGroupSettings &settings =
+            test_group.settings();
+        const std::unordered_set<std::string> test_set =
+            m_tests.test_set(test_group.test_set());
         std::vector<std::string> test_order(test_set.begin(), test_set.end());
         std::function<bool (const std::string &, const std::string &)> less;
         switch (settings.run().order())
@@ -127,7 +136,11 @@ namespace bacs{namespace system{namespace single
             test_order.erase(std::remove_if(test_order.begin(), test_order.end(),
                 [](const std::string &s)
                 {
-                    return !std::all_of(s.begin(), s.end(), boost::algorithm::is_digit());
+                    return !std::all_of(
+                        s.begin(),
+                        s.end(),
+                        boost::algorithm::is_digit()
+                    );
                 }), test_order.end());
             break;
         case problem::single::settings::Run::LEXICOGRAPHICAL:
@@ -164,6 +177,6 @@ namespace bacs{namespace system{namespace single
     }
 
     const boost::filesystem::path testing::PROBLEM_ROOT = "/problem_root";
-    const boost::filesystem::path testing::PROBLEM_BIN = testing::PROBLEM_ROOT / "bin";
-    const boost::filesystem::path testing::PROBLEM_LIB = testing::PROBLEM_ROOT / "lib";
+    const boost::filesystem::path testing::PROBLEM_BIN = PROBLEM_ROOT / "bin";
+    const boost::filesystem::path testing::PROBLEM_LIB = PROBLEM_ROOT / "lib";
 }}}

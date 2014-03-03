@@ -15,7 +15,11 @@ namespace bacs{namespace system{namespace single{namespace detail{namespace proc
             rlimit.DST = TR(resource_limits.SRC())
         {
             ProcessGroup::ResourceLimits rlimit = process_group->resourceLimits();
-            RLIM_UPDATE(real_time_limit_millis, realTimeLimit, std::chrono::milliseconds);
+            RLIM_UPDATE(
+                real_time_limit_millis,
+                realTimeLimit,
+                std::chrono::milliseconds
+            );
             process_group->setResourceLimits(rlimit);
         }
         {

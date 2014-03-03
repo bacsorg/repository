@@ -53,14 +53,21 @@ namespace bacs{namespace system{namespace single
             class wildcard: public impl
             {
             public:
-                explicit wildcard(const problem::single::testing::WildcardQuery &query):
-                    m_wildcard(query.value()), m_flags(flags(query)) {}
+                explicit wildcard(
+                    const problem::single::testing::WildcardQuery &query):
+                        m_wildcard(query.value()), m_flags(flags(query)) {}
 
                 bool match(const std::string &test_id) const override
                 {
-                    const int m = ::fnmatch(m_wildcard.c_str(), test_id.c_str(), m_flags);
+                    const int m = ::fnmatch(
+                        m_wildcard.c_str(),
+                        test_id.c_str(),
+                        m_flags
+                    );
                     if (m && m != FNM_NOMATCH)
-                        BOOST_THROW_EXCEPTION(error() << error::message("fnmatch() has failed"));
+                        BOOST_THROW_EXCEPTION(
+                            error() <<
+                            error::message("fnmatch() has failed"));
                     return !m;
                 }
 
@@ -70,7 +77,8 @@ namespace bacs{namespace system{namespace single
                     int flags_ = 0;
                     for (const int flag: query.flag())
                     {
-                        switch (static_cast<problem::single::testing::WildcardQuery::Flag>(flag))
+                        switch (static_cast<
+                            problem::single::testing::WildcardQuery::Flag>(flag))
                         {
                         case problem::single::testing::WildcardQuery::IGNORE_CASE:
                             flags_ |= FNM_CASEFOLD;
@@ -100,10 +108,12 @@ namespace bacs{namespace system{namespace single
                 boost::regex_constants::syntax_option_type flags(
                     const problem::single::testing::RegexQuery &query)
                 {
-                    boost::regex_constants::syntax_option_type flags_ = boost::regex_constants::normal;
+                    boost::regex_constants::syntax_option_type flags_ =
+                        boost::regex_constants::normal;
                     for (const int flag: query.flag())
                     {
-                        switch (static_cast<problem::single::testing::RegexQuery::Flag>(flag))
+                        switch (static_cast<
+                            problem::single::testing::RegexQuery::Flag>(flag))
                         {
                         case problem::single::testing::RegexQuery::IGNORE_CASE:
                             flags_ |= boost::regex_constants::icase;
@@ -131,7 +141,8 @@ namespace bacs{namespace system{namespace single
 
         private:
             static std::unique_ptr<impl> impl_(
-                const google::protobuf::RepeatedPtrField<problem::single::testing::TestQuery> &test_query)
+                const google::protobuf::RepeatedPtrField<
+                    problem::single::testing::TestQuery> &test_query)
             {
                 std::unique_ptr<any_of> tmp(new any_of);
                 for (const problem::single::testing::TestQuery &query: test_query)
@@ -139,7 +150,8 @@ namespace bacs{namespace system{namespace single
                 return std::move(tmp);
             }
 
-            static std::unique_ptr<impl> impl_(const problem::single::testing::TestQuery &query)
+            static std::unique_ptr<impl> impl_(
+                const problem::single::testing::TestQuery &query)
             {
                 std::unique_ptr<impl> tmp;
                 if (query.has_id())
@@ -159,7 +171,8 @@ namespace bacs{namespace system{namespace single
     }
 
     std::unordered_set<std::string> tests::test_set(
-        const google::protobuf::RepeatedPtrField<problem::single::testing::TestQuery> &test_query)
+        const google::protobuf::RepeatedPtrField<
+            problem::single::testing::TestQuery> &test_query)
     {
         const matcher m(test_query);
         const std::unordered_set<std::string> full_set = test_set();
@@ -179,7 +192,9 @@ namespace bacs{namespace system{namespace single
         m_test_id(test_id)
     {}
 
-    void test::copy(const std::string &data_id, const boost::filesystem::path &path) const
+    void test::copy(
+        const std::string &data_id,
+        const boost::filesystem::path &path) const
     {
         m_tests->copy(m_test_id, data_id, path);
     }
