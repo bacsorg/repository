@@ -20,29 +20,33 @@ namespace bacs{namespace system{namespace single{namespace builders
         };
 
     public:
-        solution_ptr build(const ContainerPointer &container,
-                           const unistd::access::Id &owner_id,
-                           const std::string &source,
-                           const problem::single::ResourceLimits &resource_limits,
-                           problem::single::result::BuildResult &result) override;
+        solution_ptr build(
+            const ContainerPointer &container,
+            const unistd::access::Id &owner_id,
+            const std::string &source,
+            const problem::single::ResourceLimits &resource_limits,
+            problem::single::result::BuildResult &result) override;
 
     protected:
         virtual name_type name(const std::string &source);
 
-        virtual ProcessPointer create_process(const ProcessGroupPointer &process_group,
-                                              const name_type &name)=0;
+        virtual ProcessPointer create_process(
+            const ProcessGroupPointer &process_group,
+            const name_type &name)=0;
 
-        virtual solution_ptr create_solution(const ContainerPointer &container,
-                                             bunsan::tempfile &&tmpdir,
-                                             const name_type &name)=0;
+        virtual solution_ptr create_solution(
+            const ContainerPointer &container,
+            bunsan::tempfile &&tmpdir,
+            const name_type &name)=0;
     };
 
     class compilable_solution: public solution
     {
     public:
-        compilable_solution(const ContainerPointer &container,
-                            bunsan::tempfile &&tmpdir,
-                            const compilable::name_type &name);
+        compilable_solution(
+            const ContainerPointer &container,
+            bunsan::tempfile &&tmpdir,
+            const compilable::name_type &name);
 
     protected:
         ContainerPointer container();

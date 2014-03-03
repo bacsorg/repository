@@ -11,11 +11,12 @@ namespace bacs{namespace system{namespace single{namespace builders
     class interpretable_solution: public compilable_solution
     {
     public:
-        interpretable_solution(const ContainerPointer &container,
-                               bunsan::tempfile &&tmpdir,
-                               const compilable::name_type &name,
-                               const boost::filesystem::path &executable,
-                               const std::vector<std::string> &flags_={});
+        interpretable_solution(
+            const ContainerPointer &container,
+            bunsan::tempfile &&tmpdir,
+            const compilable::name_type &name,
+            const boost::filesystem::path &executable,
+            const std::vector<std::string> &flags_={});
 
         ProcessPointer create(
             const ProcessGroupPointer &process_group,

@@ -12,16 +12,18 @@ namespace bacs{namespace system{namespace single{namespace builders
 {
     static const boost::filesystem::path solutions_path = "/solutions";
 
-    solution_ptr compilable::build(const ContainerPointer &container,
-                                   const unistd::access::Id &owner_id,
-                                   const std::string &source,
-                                   const problem::single::ResourceLimits &resource_limits,
-                                   problem::single::result::BuildResult &result)
+    solution_ptr compilable::build(
+        const ContainerPointer &container,
+        const unistd::access::Id &owner_id,
+        const std::string &source,
+        const problem::single::ResourceLimits &resource_limits,
+        problem::single::result::BuildResult &result)
     {
         const boost::filesystem::path solutions =
             container->filesystem().keepInRoot(solutions_path);
         boost::filesystem::create_directories(solutions);
-        bunsan::tempfile tmpdir = bunsan::tempfile::directory_in_directory(solutions);
+        bunsan::tempfile tmpdir =
+            bunsan::tempfile::directory_in_directory(solutions);
         container->filesystem().setOwnerId(
             solutions_path / tmpdir.path().filename(), owner_id);
         const name_type name_ = name(source);
@@ -41,7 +43,8 @@ namespace bacs{namespace system{namespace single{namespace builders
         process->setOwnerId(owner_id);
         process->setStream(2, FDAlias(1));
         process->setStream(1, File("log", AccessMode::WRITE_ONLY));
-        const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
+        const ProcessGroup::Result process_group_result =
+            process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         const bool success = detail::result::parse(
             process_group_result, process_result, *result.mutable_execution());

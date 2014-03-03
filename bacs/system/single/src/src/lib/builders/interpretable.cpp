@@ -8,11 +8,12 @@ namespace bacs{namespace system{namespace single{namespace builders
         return {.source = script, .executable = script};
     }
 
-    interpretable_solution::interpretable_solution(const ContainerPointer &container,
-                                                   bunsan::tempfile &&tmpdir,
-                                                   const compilable::name_type &name,
-                                                   const boost::filesystem::path &executable,
-                                                   const std::vector<std::string> &flags):
+    interpretable_solution::interpretable_solution(
+        const ContainerPointer &container,
+        bunsan::tempfile &&tmpdir,
+        const compilable::name_type &name,
+        const boost::filesystem::path &executable,
+        const std::vector<std::string> &flags):
             compilable_solution(container, std::move(tmpdir), name),
             m_executable(executable), m_flags(flags) {}
 

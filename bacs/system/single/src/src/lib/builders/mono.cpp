@@ -55,7 +55,11 @@ namespace bacs{namespace system{namespace single{namespace builders
                                         const name_type &name)
     {
         const ProcessPointer process = process_group->createProcess(m_lang + "mcs");
-        process->setArguments(process->executable(), "-out:" + name.executable.string(), name.source);
+        process->setArguments(
+            process->executable(),
+            "-out:" + name.executable.string(),
+            name.source
+        );
         return process;
     }
 

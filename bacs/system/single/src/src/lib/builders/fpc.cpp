@@ -54,7 +54,12 @@ namespace bacs{namespace system{namespace single{namespace builders
                                        const name_type &name)
     {
         const ProcessPointer process = process_group->createProcess("fpc");
-        process->setArguments(process->executable(), m_flags, name.source, "-o" + name.executable.string());
+        process->setArguments(
+            process->executable(),
+            m_flags,
+            name.source,
+            "-o" + name.executable.string()
+        );
         return process;
     }
 }}}}

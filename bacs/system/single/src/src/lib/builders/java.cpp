@@ -13,8 +13,12 @@ namespace bacs{namespace system{namespace single{namespace builders
             return tmp;
         });
 
-    static const boost::regex positional("[^=]+"), key_value("([^=]+)=(.*)");
-    static const boost::regex filename_error(".*class (\\S+) is public, should be declared in a file named \\1.java.*");
+    static const boost::regex positional("[^=]+");
+    static const boost::regex key_value("([^=]+)=(.*)");
+    static const boost::regex filename_error(
+        ".*class (\\S+) is public, should be declared "
+        "in a file named \\1.java.*"
+    );
 
     java::java(const std::vector<std::string> &arguments, bool parse_name)
     {
@@ -57,7 +61,13 @@ namespace bacs{namespace system{namespace single{namespace builders
     {
         if (m_java)
         {
-            const solution_ptr solution = m_java->build(container, owner_id, source, resource_limits, result);
+            const solution_ptr solution = m_java->build(
+                container,
+                owner_id,
+                source,
+                resource_limits,
+                result
+            );
             if (solution)
             {
                 return solution;
@@ -69,7 +79,13 @@ namespace bacs{namespace system{namespace single{namespace builders
                 {
                     BOOST_ASSERT(match.size() == 2);
                     m_java->m_class = match[1];
-                    return m_java->build(container, owner_id, source, resource_limits, result);
+                    return m_java->build(
+                        container,
+                        owner_id,
+                        source,
+                        resource_limits,
+                        result
+                    );
                 }
                 else
                 {
@@ -80,7 +96,13 @@ namespace bacs{namespace system{namespace single{namespace builders
         else
         {
             // nested object
-            return compilable::build(container, owner_id, source, resource_limits, result);
+            return compilable::build(
+                container,
+                owner_id,
+                source,
+                resource_limits,
+                result
+            );
         }
     }
 

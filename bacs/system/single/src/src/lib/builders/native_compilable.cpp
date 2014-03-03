@@ -2,11 +2,14 @@
 
 namespace bacs{namespace system{namespace single{namespace builders
 {
-    solution_ptr native_compilable::create_solution(const ContainerPointer &container,
-                                                    bunsan::tempfile &&tmpdir,
-                                                    const name_type &name)
+    solution_ptr native_compilable::create_solution(
+        const ContainerPointer &container,
+        bunsan::tempfile &&tmpdir,
+        const name_type &name)
     {
-        solution_ptr tmp(new native_compilable_solution(container, std::move(tmpdir), name));
+        solution_ptr tmp(
+            new native_compilable_solution(container, std::move(tmpdir), name)
+        );
         return tmp;
     }
 

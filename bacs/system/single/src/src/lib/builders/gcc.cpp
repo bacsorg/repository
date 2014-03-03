@@ -42,7 +42,9 @@ namespace bacs{namespace system{namespace single{namespace builders
                 }
                 else if (key == "lang")
                 {
-                    static const std::unordered_map<std::string, std::string> langs = {
+                    static const std::unordered_map<
+                        std::string, std::string
+                    > langs = {
                         {"c", "gcc"},
                         {"c++", "g++"},
                         {"objective-c", "gcc"}, // TODO unchecked
@@ -53,7 +55,9 @@ namespace bacs{namespace system{namespace single{namespace builders
                     };
                     const auto iter = langs.find(value);
                     if (iter == langs.end())
-                        BOOST_THROW_EXCEPTION(invalid_lang_error() << invalid_lang_error::argument(value));
+                        BOOST_THROW_EXCEPTION(
+                            invalid_lang_error() <<
+                            invalid_lang_error::argument(value));
                     m_executable = iter->second;
                     m_flags.push_back("-x");
                     m_flags.push_back(value);
@@ -80,7 +84,13 @@ namespace bacs{namespace system{namespace single{namespace builders
                                        const name_type &name)
     {
         const ProcessPointer process = process_group->createProcess(m_executable);
-        process->setArguments(process->executable(), m_flags, name.source, "-o", name.executable);
+        process->setArguments(
+            process->executable(),
+            m_flags,
+            name.source,
+            "-o",
+            name.executable
+        );
         return process;
     }
 }}}}

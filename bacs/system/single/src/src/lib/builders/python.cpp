@@ -48,7 +48,8 @@ namespace bacs{namespace system{namespace single{namespace builders
     ProcessPointer python::create_process(const ProcessGroupPointer &process_group,
                                           const name_type &name)
     {
-        const ProcessPointer process = process_group->createProcess("python" + m_lang);
+        const ProcessPointer process =
+            process_group->createProcess("python" + m_lang);
         process->setArguments(process->executable(), "-c", R"EOF(
 import sys
 import py_compile

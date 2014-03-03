@@ -11,7 +11,9 @@ namespace bacs{namespace system{namespace single{namespace builders
     class java: public interpretable
     {
     public:
-        explicit java(const std::vector<std::string> &arguments, const bool parse_name=true);
+        explicit java(
+            const std::vector<std::string> &arguments,
+            const bool parse_name=true);
 
         solution_ptr build(const ContainerPointer &container,
                            const unistd::access::Id &owner_id,
