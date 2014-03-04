@@ -14,12 +14,14 @@ namespace bacs{namespace system{namespace single{namespace builders
     protected:
         name_type name(const std::string &source) override;
 
-        ProcessPointer create_process(const ProcessGroupPointer &process_group,
-                                      const name_type &name) override;
+        ProcessPointer create_process(
+            const ProcessGroupPointer &process_group,
+            const name_type &name) override;
 
-        solution_ptr create_solution(const ContainerPointer &container,
-                                     bunsan::tempfile &&tmpdir,
-                                     const name_type &name) override;
+        solution_ptr create_solution(
+            const ContainerPointer &container,
+            bunsan::tempfile &&tmpdir,
+            const name_type &name) override;
 
     private:
         std::string m_lang;

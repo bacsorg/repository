@@ -69,10 +69,13 @@ namespace bacs{namespace system{namespace single{namespace builders
         return {.source = "source", .executable = "executable"};
     }
 
-    compilable_solution::compilable_solution(const ContainerPointer &container,
-                                             bunsan::tempfile &&tmpdir,
-                                             const compilable::name_type &name):
-        m_container(container), m_tmpdir(std::move(tmpdir)), m_name(name) {}
+    compilable_solution::compilable_solution(
+        const ContainerPointer &container,
+        bunsan::tempfile &&tmpdir,
+        const compilable::name_type &name):
+            m_container(container),
+            m_tmpdir(std::move(tmpdir)),
+            m_name(name) {}
 
     ContainerPointer compilable_solution::container()
     {

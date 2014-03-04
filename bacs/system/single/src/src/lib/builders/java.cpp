@@ -53,11 +53,12 @@ namespace bacs{namespace system{namespace single{namespace builders
         }
     }
 
-    solution_ptr java::build(const ContainerPointer &container,
-                             const unistd::access::Id &owner_id,
-                             const std::string &source,
-                             const problem::single::ResourceLimits &resource_limits,
-                             problem::single::result::BuildResult &result)
+    solution_ptr java::build(
+        const ContainerPointer &container,
+        const unistd::access::Id &owner_id,
+        const std::string &source,
+        const problem::single::ResourceLimits &resource_limits,
+        problem::single::result::BuildResult &result)
     {
         if (m_java)
         {
@@ -111,17 +112,19 @@ namespace bacs{namespace system{namespace single{namespace builders
         return {.source = m_class + ".java", .executable = m_class};
     }
 
-    ProcessPointer java::create_process(const ProcessGroupPointer &process_group,
-                                        const name_type &name)
+    ProcessPointer java::create_process(
+        const ProcessGroupPointer &process_group,
+        const name_type &name)
     {
         const ProcessPointer process = process_group->createProcess("javac");
         process->setArguments(process->executable(), name.source);
         return process;
     }
 
-    solution_ptr java::create_solution(const ContainerPointer &container,
-                                       bunsan::tempfile &&tmpdir,
-                                       const name_type &name)
+    solution_ptr java::create_solution(
+        const ContainerPointer &container,
+        bunsan::tempfile &&tmpdir,
+        const name_type &name)
     {
         solution_ptr tmp(new java_solution(
             container, std::move(tmpdir), name, "java", m_flags));

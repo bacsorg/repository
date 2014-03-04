@@ -34,14 +34,16 @@ namespace bacs{namespace system{namespace single{namespace builders
                 }
                 else
                 {
-                    BOOST_THROW_EXCEPTION(invalid_argument_error() <<
-                                          invalid_argument_error::argument(arg));
+                    BOOST_THROW_EXCEPTION(
+                        invalid_argument_error() <<
+                        invalid_argument_error::argument(arg));
                 }
             }
             else
             {
-                BOOST_THROW_EXCEPTION(invalid_argument_error() <<
-                                      invalid_argument_error::argument(arg));
+                BOOST_THROW_EXCEPTION(
+                    invalid_argument_error() <<
+                    invalid_argument_error::argument(arg));
             }
         }
     }
@@ -51,10 +53,12 @@ namespace bacs{namespace system{namespace single{namespace builders
         return {.source = "source.cs", .executable = "source.exe"};
     }
 
-    ProcessPointer mono::create_process(const ProcessGroupPointer &process_group,
-                                        const name_type &name)
+    ProcessPointer mono::create_process(
+        const ProcessGroupPointer &process_group,
+        const name_type &name)
     {
-        const ProcessPointer process = process_group->createProcess(m_lang + "mcs");
+        const ProcessPointer process =
+            process_group->createProcess(m_lang + "mcs");
         process->setArguments(
             process->executable(),
             "-out:" + name.executable.string(),
@@ -63,9 +67,10 @@ namespace bacs{namespace system{namespace single{namespace builders
         return process;
     }
 
-    solution_ptr mono::create_solution(const ContainerPointer &container,
-                                       bunsan::tempfile &&tmpdir,
-                                       const name_type &name)
+    solution_ptr mono::create_solution(
+        const ContainerPointer &container,
+        bunsan::tempfile &&tmpdir,
+        const name_type &name)
     {
         solution_ptr tmp(new interpretable_solution(
             container, std::move(tmpdir), name, "mono", m_flags));

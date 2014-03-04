@@ -8,8 +8,9 @@ namespace bacs{namespace system{namespace single{namespace builders
         explicit gcc(const std::vector<std::string> &arguments);
 
     protected:
-        ProcessPointer create_process(const ProcessGroupPointer &process_group,
-                                      const name_type &name) override;
+        ProcessPointer create_process(
+            const ProcessGroupPointer &process_group,
+            const name_type &name) override;
 
     private:
         std::string m_executable;

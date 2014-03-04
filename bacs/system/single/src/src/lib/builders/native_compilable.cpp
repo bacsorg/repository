@@ -17,7 +17,8 @@ namespace bacs{namespace system{namespace single{namespace builders
         const ProcessGroupPointer &process_group,
         const ProcessArguments &arguments)
     {
-        const ProcessPointer process = process_group->createProcess(executable());
+        const ProcessPointer process =
+            process_group->createProcess(executable());
         process->setArguments(process->executable(), arguments);
         return process;
     }

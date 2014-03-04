@@ -68,22 +68,26 @@ namespace bacs{namespace system{namespace single{namespace builders
                 }
                 else
                 {
-                    BOOST_THROW_EXCEPTION(invalid_argument_error() <<
-                                          invalid_argument_error::argument(arg));
+                    BOOST_THROW_EXCEPTION(
+                        invalid_argument_error() <<
+                        invalid_argument_error::argument(arg));
                 }
             }
             else
             {
-                BOOST_THROW_EXCEPTION(invalid_argument_error() <<
-                                      invalid_argument_error::argument(arg));
+                BOOST_THROW_EXCEPTION(
+                    invalid_argument_error() <<
+                    invalid_argument_error::argument(arg));
             }
         }
     }
 
-    ProcessPointer gcc::create_process(const ProcessGroupPointer &process_group,
-                                       const name_type &name)
+    ProcessPointer gcc::create_process(
+        const ProcessGroupPointer &process_group,
+        const name_type &name)
     {
-        const ProcessPointer process = process_group->createProcess(m_executable);
+        const ProcessPointer process =
+            process_group->createProcess(m_executable);
         process->setArguments(
             process->executable(),
             m_flags,

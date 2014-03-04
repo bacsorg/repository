@@ -2,8 +2,6 @@
 
 #include "interpretable.hpp"
 
-#include <bunsan/forward_constructor.hpp>
-
 #include <memory>
 
 namespace bacs{namespace system{namespace single{namespace builders
@@ -15,21 +13,24 @@ namespace bacs{namespace system{namespace single{namespace builders
             const std::vector<std::string> &arguments,
             const bool parse_name=true);
 
-        solution_ptr build(const ContainerPointer &container,
-                           const unistd::access::Id &owner_id,
-                           const std::string &source,
-                           const problem::single::ResourceLimits &resource_limits,
-                           problem::single::result::BuildResult &result) override;
+        solution_ptr build(
+            const ContainerPointer &container,
+            const unistd::access::Id &owner_id,
+            const std::string &source,
+            const problem::single::ResourceLimits &resource_limits,
+            problem::single::result::BuildResult &result) override;
 
     protected:
         name_type name(const std::string &source);
 
-        ProcessPointer create_process(const ProcessGroupPointer &process_group,
-                                      const name_type &name) override;
+        ProcessPointer create_process(
+            const ProcessGroupPointer &process_group,
+            const name_type &name) override;
 
-        solution_ptr create_solution(const ContainerPointer &container,
-                                     bunsan::tempfile &&tmpdir,
-                                     const name_type &name) override;
+        solution_ptr create_solution(
+            const ContainerPointer &container,
+            bunsan::tempfile &&tmpdir,
+            const name_type &name) override;
 
     private:
         std::unique_ptr<java> m_java;
@@ -44,7 +45,7 @@ namespace bacs{namespace system{namespace single{namespace builders
     class java_solution: public interpretable_solution
     {
     public:
-        BUNSAN_INHERIT_CONSTRUCTOR(java_solution, interpretable_solution)
+        using interpretable_solution::interpretable_solution;
 
     protected:
         std::vector<std::string> arguments() const override;

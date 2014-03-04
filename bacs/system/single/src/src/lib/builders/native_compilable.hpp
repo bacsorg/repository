@@ -15,9 +15,7 @@ namespace bacs{namespace system{namespace single{namespace builders
     class native_compilable_solution: public compilable_solution
     {
     public:
-        template <typename ... Args>
-        explicit native_compilable_solution(Args &&...args):
-            compilable_solution(std::forward<Args>(args)...) {}
+        using compilable_solution::compilable_solution;
 
         ProcessPointer create(
             const ProcessGroupPointer &process_group,
