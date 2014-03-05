@@ -6,10 +6,15 @@ cmake_minimum_required(VERSION 2.8)
 
 include(BunsanCommon)
 
-bunsan_use_boost(system filesystem serialization iostreams program_options regex thread)
-bunsan_use_xmlrpc(c++2 libwww-client abyss-server)
+bunsan_use_boost(system filesystem regex serialization)
 bunsan_use_protobuf()
-bunsan_use_bunsan(common pm bacs_problem bacs_problem_single)
+bunsan_use_bunsan(
+    common
+    bacs_common
+    bacs_system
+    bacs_problem
+    bacs_problem_single
+)
 bunsan_use(
     yandex_contest_common
     yandex_contest_system
@@ -29,24 +34,9 @@ bunsan_add_executable(${PROJECT_NAME}
     src/bin/main.cpp
 
     src/lib/tests.cpp
-    src/lib/builder.cpp
     src/lib/testing.cpp
-    src/lib/callback.cpp
 
-    src/lib/detail/process.cpp
     src/lib/detail/file.cpp
-    src/lib/detail/result.cpp
-
-    src/lib/callbacks/xmlrpc.cpp
-
-    src/lib/builders/compilable.cpp
-    src/lib/builders/native_compilable.cpp
-    src/lib/builders/gcc.cpp
-    src/lib/builders/fpc.cpp
-    src/lib/builders/interpretable.cpp
-    src/lib/builders/python.cpp
-    src/lib/builders/java.cpp
-    src/lib/builders/mono.cpp
 )
 
 bunsan_install_headers()

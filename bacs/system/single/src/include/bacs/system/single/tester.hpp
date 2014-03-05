@@ -7,6 +7,8 @@
 #include <bacs/problem/single/result.pb.h>
 #include <bacs/problem/single/task.pb.h>
 
+#include <bacs/process.pb.h>
+
 #include <yandex/contest/invoker/Forward.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -25,8 +27,8 @@ namespace bacs{namespace system{namespace single
         ~tester();
 
         bool build(
-            const problem::single::task::Solution &solution,
-            problem::single::result::BuildResult &result);
+            const bacs::process::Buildable &solution,
+            bacs::process::BuildResult &result);
 
         bool test(const problem::single::settings::ProcessSettings &settings,
                   const single::test &test_,

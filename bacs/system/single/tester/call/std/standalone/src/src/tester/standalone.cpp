@@ -1,13 +1,11 @@
 #include <bacs/system/single/tester.hpp>
 
-#include <bacs/system/single/builder.hpp>
+#include <bacs/system/builder.hpp>
 #include <bacs/system/single/error.hpp>
 #include <bacs/system/single/detail/file.hpp>
-#include <bacs/system/single/detail/process.hpp>
-#include <bacs/system/single/detail/result.hpp>
 #include <bacs/system/single/testing.hpp>
 
-#include <bacs/problem/single/resource.pb.h>
+#include <bacs/system/process.hpp>
 
 #include <yandex/contest/invoker/All.hpp>
 
@@ -35,7 +33,7 @@ namespace bacs{namespace system{namespace single
 
         ContainerPointer container;
         builder_ptr builder;
-        solution_ptr solution;
+        executable_ptr solution;
         checker checker_;
     };
 
@@ -45,16 +43,17 @@ namespace bacs{namespace system{namespace single
     tester::~tester() { /* implicit destructor */ }
 
     bool tester::build(
-        const problem::single::task::Solution &solution,
-        problem::single::result::BuildResult &result)
+        const bacs::process::Buildable &solution,
+        bacs::process::BuildResult &result)
     {
-        pimpl->builder = builder::instance(solution.build().builder());
+        pimpl->builder = builder::instance(solution.build_settings().builder());
         pimpl->solution = pimpl->builder->build(
             pimpl->container,
             OWNER_ID,
             solution.source(),
-            solution.build().resource_limits(),
-            result);
+            solution.build_settings().resource_limits(),
+            result
+        );
         return static_cast<bool>(pimpl->solution);
     }
 
@@ -76,7 +75,7 @@ namespace bacs{namespace system{namespace single
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
         const ProcessPointer process = pimpl->solution->create(
             process_group, settings.execution().argument());
-        detail::process::setup(settings.resource_limits(), process_group, process);
+        process::setup(process_group, process, settings.resource_limits());
         // files
         file_map test_files, solution_files;
         for (const std::string &data_id: test_.data_set())
@@ -136,7 +135,7 @@ namespace bacs{namespace system{namespace single
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         // fill result
-        const bool execution_success = detail::result::parse(
+        const bool execution_success = process::parse_result(
             process_group_result, process_result, *result.mutable_execution());
         for (const receive_type &r: receive)
         {
@@ -173,7 +172,7 @@ namespace bacs{namespace system{namespace single
                 data_id_path.second = pimpl->container->filesystem().keepInRoot(data_id_path.second);
             pimpl->checker_.check(test_files, solution_files, *result.mutable_judge());
         }
-        return result.execution().status() == problem::single::result::Execution::OK &&
+        return result.execution().status() == bacs::process::ExecutionResult::OK &&
             result.judge().status() == problem::single::result::Judge::OK;
     }
 }}}

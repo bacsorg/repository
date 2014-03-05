@@ -1,13 +1,11 @@
 #include <bacs/system/single/tester.hpp>
 
-#include <bacs/system/single/builder.hpp>
+#include <bacs/system/builder.hpp>
 #include <bacs/system/single/error.hpp>
 #include <bacs/system/single/detail/file.hpp>
-#include <bacs/system/single/detail/process.hpp>
-#include <bacs/system/single/detail/result.hpp>
 #include <bacs/system/single/testing.hpp>
 
-#include <bacs/problem/single/resource.pb.h>
+#include <bacs/system/process.hpp>
 
 #include <yandex/contest/invoker/All.hpp>
 
@@ -36,7 +34,7 @@ namespace bacs{namespace system{namespace single
 
         ContainerPointer container;
         builder_ptr builder;
-        solution_ptr solution;
+        executable_ptr solution;
         checker checker_;
     };
 
@@ -46,15 +44,15 @@ namespace bacs{namespace system{namespace single
     tester::~tester() { /* implicit destructor */ }
 
     bool tester::build(
-        const problem::single::task::Solution &solution,
-        problem::single::result::BuildResult &result)
+        const bacs::process::Buildable &solution,
+        bacs::process::BuildResult &result)
     {
-        pimpl->builder = builder::instance(solution.build().builder());
+        pimpl->builder = builder::instance(solution.build_settings().builder());
         pimpl->solution = pimpl->builder->build(
             pimpl->container,
             SOLUTION_OWNER_ID,
             solution.source(),
-            solution.build().resource_limits(),
+            solution.build_settings().resource_limits(),
             result);
         return static_cast<bool>(pimpl->solution);
     }
@@ -78,7 +76,7 @@ namespace bacs{namespace system{namespace single
 
         const ProcessPointer process = pimpl->solution->create(
             process_group, settings.execution().argument());
-        detail::process::setup(settings.resource_limits(), process_group, process);
+        system::process::setup(process_group, process, settings.resource_limits());
         process->setTerminateGroupOnCrash(false);
 
         const ProcessPointer interactor =
@@ -155,10 +153,10 @@ namespace bacs{namespace system{namespace single
         const Process::Result interactor_result = interactor->result();
         const Process::Result pipectl_result = pipectl->result();
         // fill result
-        const bool execution_success = detail::result::parse(
+        const bool execution_success = process::parse_result(
             process_group_result, process_result, *result.mutable_execution());
 
-        const bool interactor_execution_success = detail::result::parse(
+        const bool interactor_execution_success = process::parse_result(
             process_group_result,
             interactor_result,
             *result.mutable_judge()->mutable_utilities()->mutable_interactor()->mutable_execution()
@@ -169,7 +167,7 @@ namespace bacs{namespace system{namespace single
             problem::single::result::Judge::AuxiliaryUtility &utility =
                 *result.mutable_judge()->mutable_utilities()->add_auxiliary();
             utility.set_name("pipectl [interactor -> solution]");
-            const bool pipectl_execution_success = detail::result::parse(
+            const bool pipectl_execution_success = process::parse_result(
                 process_group_result,
                 pipectl_result,
                 *utility.mutable_utility()->mutable_execution()
@@ -178,17 +176,17 @@ namespace bacs{namespace system{namespace single
 
         // analyze
         {
-            const problem::single::result::Execution &interactor_execution =
+            const bacs::process::ExecutionResult &interactor_execution =
                 result.judge().utilities().interactor().execution();
 
             problem::single::result::Judge &judge = *result.mutable_judge();
 
             switch (interactor_execution.status())
             {
-            case problem::single::result::Execution::OK:
+            case bacs::process::ExecutionResult::OK:
                 judge.set_status(problem::single::result::Judge::OK);
                 break;
-            case problem::single::result::Execution::ABNORMAL_EXIT:
+            case bacs::process::ExecutionResult::ABNORMAL_EXIT:
                 if (interactor_execution.has_exit_status())
                 {
                     switch (interactor_execution.exit_status())
@@ -228,17 +226,18 @@ namespace bacs{namespace system{namespace single
                     judge.set_status(problem::single::result::Judge::FAILED);
                 }
                 break;
-            case problem::single::result::Execution::MEMORY_LIMIT_EXCEEDED:
-            case problem::single::result::Execution::TIME_LIMIT_EXCEEDED:
-            case problem::single::result::Execution::OUTPUT_LIMIT_EXCEEDED:
-            case problem::single::result::Execution::REAL_TIME_LIMIT_EXCEEDED:
-            case problem::single::result::Execution::FAILED:
+            case bacs::process::ExecutionResult::MEMORY_LIMIT_EXCEEDED:
+            case bacs::process::ExecutionResult::TIME_LIMIT_EXCEEDED:
+            case bacs::process::ExecutionResult::OUTPUT_LIMIT_EXCEEDED:
+            case bacs::process::ExecutionResult::REAL_TIME_LIMIT_EXCEEDED:
+            case bacs::process::ExecutionResult::TERMINATED_BY_SYSTEM:
+            case bacs::process::ExecutionResult::FAILED:
                 judge.set_status(problem::single::result::Judge::FAILED);
                 break;
             }
         }
         // TODO checker
-        return result.execution().status() == problem::single::result::Execution::OK &&
+        return result.execution().status() == bacs::process::ExecutionResult::OK &&
             result.judge().status() == problem::single::result::Judge::OK;
     }
 }}}

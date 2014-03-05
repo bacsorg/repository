@@ -61,7 +61,7 @@ namespace bacs{namespace system{namespace single
         send_intermediate();
     }
 
-    void testing::test(const problem::single::task::Solution &solution,
+    void testing::test(const bacs::process::Buildable &solution,
                        const problem::single::testing::SolutionTesting &testing)
     {
         check_hash() && build(solution) && test(testing);
@@ -76,7 +76,7 @@ namespace bacs{namespace system{namespace single
         return true;
     }
 
-    bool testing::build(const problem::single::task::Solution &solution)
+    bool testing::build(const bacs::process::Buildable &solution)
     {
         m_intermediate.set_state(problem::single::intermediate::BUILDING);
         send_intermediate();

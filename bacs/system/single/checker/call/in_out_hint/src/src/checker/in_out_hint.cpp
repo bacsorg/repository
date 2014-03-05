@@ -1,7 +1,8 @@
 #include <bacs/system/single/checker.hpp>
 
-#include <bacs/system/single/detail/result.hpp>
 #include <bacs/system/single/testing.hpp>
+
+#include <bacs/system/process.hpp>
 
 #include <yandex/contest/invoker/All.hpp>
 
@@ -68,19 +69,19 @@ namespace bacs{namespace system{namespace single
         const ProcessGroup::Result process_group_result =
             process_group->synchronizedCall();
         const Process::Result process_result = process->result();
-        const bool success = detail::result::parse(
+        const bool success = process::parse_result(
             process_group_result,
             process_result,
             *result.mutable_utilities()->mutable_checker()->mutable_execution()
         );
-        const problem::single::result::Execution &checker_execution =
+        const bacs::process::ExecutionResult &checker_execution =
             result.utilities().checker().execution();
         switch (checker_execution.status())
         {
-        case problem::single::result::Execution::OK:
+        case bacs::process::ExecutionResult::OK:
             result.set_status(problem::single::result::Judge::OK);
             break;
-        case problem::single::result::Execution::ABNORMAL_EXIT:
+        case bacs::process::ExecutionResult::ABNORMAL_EXIT:
             if (checker_execution.has_exit_status())
             {
                 switch (checker_execution.exit_status())
@@ -104,11 +105,12 @@ namespace bacs{namespace system{namespace single
                 result.set_status(problem::single::result::Judge::FAILED);
             }
             break;
-        case problem::single::result::Execution::MEMORY_LIMIT_EXCEEDED:
-        case problem::single::result::Execution::TIME_LIMIT_EXCEEDED:
-        case problem::single::result::Execution::OUTPUT_LIMIT_EXCEEDED:
-        case problem::single::result::Execution::REAL_TIME_LIMIT_EXCEEDED:
-        case problem::single::result::Execution::FAILED:
+        case bacs::process::ExecutionResult::MEMORY_LIMIT_EXCEEDED:
+        case bacs::process::ExecutionResult::TIME_LIMIT_EXCEEDED:
+        case bacs::process::ExecutionResult::OUTPUT_LIMIT_EXCEEDED:
+        case bacs::process::ExecutionResult::REAL_TIME_LIMIT_EXCEEDED:
+        case bacs::process::ExecutionResult::TERMINATED_BY_SYSTEM:
+        case bacs::process::ExecutionResult::FAILED:
             result.set_status(problem::single::result::Judge::FAILED);
             break;
         }

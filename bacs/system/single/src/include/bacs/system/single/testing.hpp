@@ -23,13 +23,13 @@ namespace bacs{namespace system{namespace single
     public:
         explicit testing(const problem::single::task::Callbacks &callbacks);
 
-        void test(const problem::single::task::Solution &solution,
+        void test(const bacs::process::Buildable &solution,
                   const problem::single::testing::SolutionTesting &testing);
 
     private:
         bool check_hash();
 
-        bool build(const problem::single::task::Solution &solution);
+        bool build(const bacs::process::Buildable &solution);
 
         bool test(const problem::single::testing::SolutionTesting &testing);
 
