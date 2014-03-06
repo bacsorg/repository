@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 
 include(BunsanCommon)
 
-bunsan_use_boost(system filesystem serialization program_options thread)
+bunsan_use_boost(system filesystem serialization)
 bunsan_use_bunsan(common)
 
 bunsan_add_executable(${PROJECT_NAME}
@@ -14,4 +14,4 @@ bunsan_add_executable(${PROJECT_NAME}
 )
 
 bunsan_install_targets(${PROJECT_NAME})
-install(FILES TestsCMakeLists.txt DESTINATION . RENAME CMakeLists.txt )
+install(FILES TestsCMakeLists.txt DESTINATION . RENAME CMakeLists.txt)
