@@ -237,7 +237,12 @@ namespace bacs{namespace system{namespace single
             }
         }
         // TODO checker
-        return result.execution().status() == bacs::process::ExecutionResult::OK &&
-            result.judge().status() == problem::single::result::Judge::OK;
+        result.set_status(
+            result.execution().status() == bacs::process::ExecutionResult::OK &&
+            result.judge().status() == problem::single::result::Judge::OK ?
+                problem::single::result::TestResult::OK :
+                problem::single::result::TestResult::FAILED
+        );
+        return result.status() == problem::single::result::TestResult::OK;
     }
 }}}

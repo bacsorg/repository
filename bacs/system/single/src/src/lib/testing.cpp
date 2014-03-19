@@ -148,9 +148,12 @@ namespace bacs{namespace system{namespace single
             break;
         }
         std::sort(test_order.begin(), test_order.end(), less);
+        bool skip = false;
         for (const std::string &test_id: test_order)
         {
-            const bool ret = test(settings.process(), test_id, *result.add_test());
+            const bool ret = !skip ?
+                test(settings.process(), test_id, *result.add_test()) :
+                skip_test(test_id, *result.add_test());
             switch (settings.run().algorithm())
             {
             case problem::single::settings::Run::ALL:
@@ -158,7 +161,7 @@ namespace bacs{namespace system{namespace single
                 break;
             case problem::single::settings::Run::WHILE_NOT_FAIL:
                 if (!ret)
-                    return false;
+                    skip = true;
                 break;
             }
         }
@@ -174,6 +177,16 @@ namespace bacs{namespace system{namespace single
         const bool ret = m_tester.test(settings, m_tests.test(test_id), result);
         result.set_id(test_id);
         return ret;
+    }
+
+    bool testing::skip_test(const std::string &test_id,
+                            problem::single::result::TestResult &result)
+    {
+        m_intermediate.set_test_id(test_id);
+        send_intermediate();
+        result.set_id(test_id);
+        result.set_status(problem::single::result::TestResult::SKIPPED);
+        return false;
     }
 
     const boost::filesystem::path testing::PROBLEM_ROOT = "/problem_root";

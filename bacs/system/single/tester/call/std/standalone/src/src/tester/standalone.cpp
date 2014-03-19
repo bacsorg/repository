@@ -172,7 +172,12 @@ namespace bacs{namespace system{namespace single
                 data_id_path.second = pimpl->container->filesystem().keepInRoot(data_id_path.second);
             pimpl->checker_.check(test_files, solution_files, *result.mutable_judge());
         }
-        return result.execution().status() == bacs::process::ExecutionResult::OK &&
-            result.judge().status() == problem::single::result::Judge::OK;
+        result.set_status(
+            result.execution().status() == bacs::process::ExecutionResult::OK &&
+            result.judge().status() == problem::single::result::Judge::OK ?
+                problem::single::result::TestResult::OK :
+                problem::single::result::TestResult::FAILED
+        );
+        return result.status() == problem::single::result::TestResult::OK;
     }
 }}}

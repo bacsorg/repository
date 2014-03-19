@@ -33,6 +33,9 @@ namespace bacs{namespace system{namespace single
 
         bool test(const problem::single::testing::SolutionTesting &testing);
 
+        bool skip_test(const std::string &test_id,
+                       problem::single::result::TestResult &result);
+
     private:
         void send_intermediate();
         void send_result();

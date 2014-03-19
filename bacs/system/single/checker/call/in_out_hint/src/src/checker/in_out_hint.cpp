@@ -62,7 +62,7 @@ namespace bacs{namespace system{namespace single
         }
         process->setArguments(process->executable(), "in", "out", hint_arg);
         process->setCurrentPath(checking_path);
-        process->setStream(2, FDAlias(1));
+        process->setStream(2, FdAlias(1));
         process->setStream(1, File(checking_log, AccessMode::WRITE_ONLY));
         // TODO process->setResourceLimits()
         // execute
