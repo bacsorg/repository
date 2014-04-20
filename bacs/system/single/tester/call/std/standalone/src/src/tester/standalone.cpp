@@ -1,6 +1,7 @@
 #include <bacs/system/single/tester.hpp>
 
 #include <bacs/system/builder.hpp>
+#include <bacs/system/file.hpp>
 #include <bacs/system/single/error.hpp>
 #include <bacs/system/single/detail/file.hpp>
 #include <bacs/system/single/testing.hpp>
@@ -84,7 +85,7 @@ namespace bacs{namespace system{namespace single
         {
             std::string id;
             boost::filesystem::path path;
-            problem::single::settings::File::Range range;
+            bacs::file::Range range;
         };
         std::vector<receive_type> receive;
         for (const problem::single::settings::File &file: settings.file())
@@ -142,28 +143,7 @@ namespace bacs{namespace system{namespace single
             BOOST_ASSERT(boost::filesystem::exists(r.path));
             problem::single::result::File &file = *result.add_file();
             file.set_id(r.id);
-            std::string &data = *file.mutable_data();
-            bunsan::filesystem::ifstream fin(r.path, std::ios::binary);
-            BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin)
-            {
-                switch (r.range.whence())
-                {
-                case problem::single::settings::File::Range::BEGIN:
-                    fin.seekg(r.range.offset(), std::ios::beg);
-                    break;
-                case problem::single::settings::File::Range::END:
-                    fin.seekg(r.range.offset(), std::ios::end);
-                    break;
-                }
-                char buf[4096];
-                while (fin && data.size() < r.range.size())
-                {
-                    fin.read(buf, std::min(sizeof(buf), r.range.size() - data.size()));
-                    data.insert(data.end(), buf, buf + fin.gcount());
-                }
-            }
-            BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fin)
-            fin.close();
+            *file.mutable_data() = bacs::system::file::read(r.path, r.range);
         }
         if (execution_success)
         {
