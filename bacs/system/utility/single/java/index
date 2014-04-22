@@ -1,0 +1,14 @@
+source
+{
+    self
+    {
+        . src
+    }
+    import
+    {
+        source
+        {
+            . bacs/system/utility/single/c_cpp_flags
+        }
+    }
+}

@@ -1,0 +1,23 @@
+#include <vector>
+
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    const char java[] = "${Java_JAVA_EXECUTABLE}";
+    const char jar[] = "${CMAKE_INSTALL_PREFIX}/lib/${target_jar_name}";
+
+    std::vector<const char *> args;
+    args.push_back(java);
+    args.push_back("-jar");
+    args.push_back(jar);
+
+    for (int i = 1; i < argc; ++i)
+        args.push_back(argv[i]);
+    args.push_back(0);
+
+    return execv(
+        java,
+        const_cast<char **>(args.data())
+    );
+}
