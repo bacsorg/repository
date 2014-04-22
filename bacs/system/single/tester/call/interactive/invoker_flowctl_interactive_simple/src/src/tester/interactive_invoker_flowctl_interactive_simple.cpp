@@ -29,6 +29,8 @@ namespace bacs{namespace system{namespace single
     static const unistd::access::Id SOLUTION_OWNER_ID(1000, 1000);
     static const unistd::access::Id INTERACTOR_OWNER_ID(1000, 1000);
 
+    constexpr std::size_t MAX_MESSAGE_SIZE = 1024 * 1024;
+
     class tester::impl
     {
     public:
@@ -169,37 +171,36 @@ namespace bacs{namespace system{namespace single
             interactor->setStream(2, File(interactor_log_path, AccessMode::WRITE_ONLY));
         }
 
-        {
-            const auto data_set = test_.data_set();
+        // interactor files
+        const auto data_set = test_.data_set();
 
-            BOOST_ASSERT(data_set.find("in") != data_set.end());
-            const boost::filesystem::path test_in = current_path / "in";
-            env["JUDGE_TEST_IN"] = test_in.string();
+        BOOST_ASSERT(data_set.find("in") != data_set.end());
+        const boost::filesystem::path test_in = current_path / "in";
+        env["JUDGE_TEST_IN"] = test_in.string();
+        test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
+        pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setMode(test_in, 0500);
+
+        if (data_set.find("out") != data_set.end())
+        {
+            const boost::filesystem::path test_in = current_path / "hint";
+            env["JUDGE_TEST_HINT"] = test_in.string();
             test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
             pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
             pimpl->container->filesystem().setMode(test_in, 0500);
-
-            if (data_set.find("out") != data_set.end())
-            {
-                const boost::filesystem::path test_in = current_path / "hint";
-                env["JUDGE_TEST_HINT"] = test_in.string();
-                test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
-                pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
-                pimpl->container->filesystem().setMode(test_in, 0500);
-            }
-
-            const boost::filesystem::path interactor_output = current_path / "output";
-            env["JUDGE_INTERACTOR_OUTPUT"] = interactor_output.string();
-            detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_output));
-            pimpl->container->filesystem().setOwnerId(interactor_output, INTERACTOR_OWNER_ID);
-            pimpl->container->filesystem().setMode(interactor_output, 0500);
-
-            const boost::filesystem::path interactor_custom_message = current_path / "custom_message";
-            env["JUDGE_INTERACTOR_CUSTOM_MESSAGE"] = interactor_custom_message.string();
-            detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_custom_message));
-            pimpl->container->filesystem().setOwnerId(interactor_custom_message, INTERACTOR_OWNER_ID);
-            pimpl->container->filesystem().setMode(interactor_custom_message, 0500);
         }
+
+        const boost::filesystem::path interactor_output = current_path / "output";
+        env["JUDGE_INTERACTOR_OUTPUT"] = interactor_output.string();
+        detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_output));
+        pimpl->container->filesystem().setOwnerId(interactor_output, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setMode(interactor_output, 0500);
+
+        const boost::filesystem::path interactor_custom_message = current_path / "custom_message";
+        env["JUDGE_INTERACTOR_CUSTOM_MESSAGE"] = interactor_custom_message.string();
+        detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_custom_message));
+        pimpl->container->filesystem().setOwnerId(interactor_custom_message, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setMode(interactor_custom_message, 0500);
 
         interactor->setEnvironment(env);
 
@@ -236,7 +237,7 @@ namespace bacs{namespace system{namespace single
                 bacs::file::Range range;
                 range.set_whence(bacs::file::Range::BEGIN);
                 range.set_offset(0);
-                range.set_size(1024 * 1024);
+                range.set_size(MAX_MESSAGE_SIZE);
 
                 problem::single::result::File &file = *result.add_file();
                 file.set_id(id);
@@ -317,8 +318,14 @@ namespace bacs{namespace system{namespace single
                     break;
                 case 100:
                     judge.set_status(problem::single::result::Judge::CUSTOM_FAILURE);
-                    // TODO load custom message
-                    judge.set_message("TODO (custom failure)");
+                    judge.set_message(
+                        bacs::system::file::read_first(
+                            pimpl->container->filesystem().keepInRoot(
+                                interactor_custom_message
+                            ),
+                            MAX_MESSAGE_SIZE
+                        )
+                    );
                     break;
                 case 200:
                     judge.set_status(problem::single::result::Judge::FAIL_TEST);
