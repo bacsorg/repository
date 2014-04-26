@@ -179,7 +179,7 @@ namespace bacs{namespace system{namespace single
         env["JUDGE_TEST_IN"] = test_in.string();
         test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
         pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
-        pimpl->container->filesystem().setMode(test_in, 0500);
+        pimpl->container->filesystem().setMode(test_in, 0400);
 
         if (data_set.find("out") != data_set.end())
         {
@@ -187,20 +187,20 @@ namespace bacs{namespace system{namespace single
             env["JUDGE_TEST_HINT"] = test_in.string();
             test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
             pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
-            pimpl->container->filesystem().setMode(test_in, 0500);
+            pimpl->container->filesystem().setMode(test_in, 0600);
         }
 
         const boost::filesystem::path interactor_output = current_path / "output";
         env["JUDGE_INTERACTOR_OUTPUT"] = interactor_output.string();
         detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_output));
         pimpl->container->filesystem().setOwnerId(interactor_output, INTERACTOR_OWNER_ID);
-        pimpl->container->filesystem().setMode(interactor_output, 0500);
+        pimpl->container->filesystem().setMode(interactor_output, 0600);
 
         const boost::filesystem::path interactor_custom_message = current_path / "custom_message";
         env["JUDGE_INTERACTOR_CUSTOM_MESSAGE"] = interactor_custom_message.string();
         detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_custom_message));
         pimpl->container->filesystem().setOwnerId(interactor_custom_message, INTERACTOR_OWNER_ID);
-        pimpl->container->filesystem().setMode(interactor_custom_message, 0500);
+        pimpl->container->filesystem().setMode(interactor_custom_message, 0600);
 
         interactor->setEnvironment(env);
 
