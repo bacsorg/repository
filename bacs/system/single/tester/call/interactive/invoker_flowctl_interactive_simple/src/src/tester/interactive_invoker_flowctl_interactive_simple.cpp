@@ -356,7 +356,12 @@ namespace bacs{namespace system{namespace single
             break;
         }
 
-        // TODO checker
+        if (result.execution().status() == bacs::process::ExecutionResult::OK &&
+            result.judge().status() == problem::single::result::Judge::OK)
+        {
+            solution_files["stdout"] = pimpl->container->filesystem().keepInRoot(interactor_output);
+            pimpl->checker_.check(test_files, solution_files, *result.mutable_judge());
+        }
 
         goto return_;
 
