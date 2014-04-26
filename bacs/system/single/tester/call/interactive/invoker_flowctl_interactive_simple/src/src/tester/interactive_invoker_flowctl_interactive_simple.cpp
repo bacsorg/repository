@@ -227,7 +227,11 @@ namespace bacs{namespace system{namespace single
         const bool interactor_execution_success = process::parse_result(
             process_group_result,
             interactor_result,
-            *result.mutable_judge()->mutable_utilities()->mutable_interactor()->mutable_execution()
+            *result.
+                mutable_judge()->
+                mutable_utilities()->
+                mutable_interactor()->
+                mutable_execution()
         );
 
         // logging
@@ -275,14 +279,16 @@ namespace bacs{namespace system{namespace single
             case Broker::SOLUTION_TERMINATION_REAL_TIME_LIMIT_EXCEEDED:
                 if (!interactor_execution.has_exit_status())
                 {
-                    judge.set_status(problem::single::result::Judge::TERMINATION_REAL_TIME_LIMIT_EXCEEDED);
+                    judge.set_status(
+                        problem::single::result::Judge::TERMINATION_REAL_TIME_LIMIT_EXCEEDED);
                 }
                 else if (interactor_execution.exit_status() == 0)
                 {
                     if (result.execution().status() == bacs::process::ExecutionResult::OK)
-                        judge.set_status(problem::single::result::Judge::TERMINATION_REAL_TIME_LIMIT_EXCEEDED);
+                        judge.set_status(
+                            problem::single::result::Judge::TERMINATION_REAL_TIME_LIMIT_EXCEEDED);
                     else
-                        judge.set_status(problem::single::result::Judge::OK);
+                        judge.set_status(problem::single::result::Judge::SKIPPED);
                 }
                 else
                 {
@@ -314,7 +320,7 @@ namespace bacs{namespace system{namespace single
                     if (result.execution().status() == bacs::process::ExecutionResult::OK)
                         judge.set_status(problem::single::result::Judge::INSUFFICIENT_DATA);
                     else
-                        judge.set_status(problem::single::result::Judge::OK);
+                        judge.set_status(problem::single::result::Judge::SKIPPED);
                     break;
                 case 100:
                     judge.set_status(problem::single::result::Judge::CUSTOM_FAILURE);
