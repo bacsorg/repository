@@ -254,6 +254,12 @@ namespace bacs{namespace system{namespace single
             bacs::system::file::read_first(broker_log.path(), MAX_MESSAGE_SIZE));
 
         // analyze
+        if (result.execution().status() ==
+            bacs::process::ExecutionResult::REAL_TIME_LIMIT_EXCEEDED)
+        {
+            judge.set_status(problem::single::result::Judge::SKIPPED);
+            goto return_;
+        }
         if (!broker_execution.has_exit_status())
             goto failed_;
         switch (broker_execution.status())
