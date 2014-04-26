@@ -218,41 +218,30 @@ namespace bacs{namespace system{namespace single
         const Process::Result broker_result = broker->result();
 
         // fill result
+        problem::single::result::Judge &judge = *result.mutable_judge();
+
         const bool execution_success = process::parse_result(
             process_group_result,
             solution_result,
             *result.mutable_execution()
         );
 
+        // utilities
         const bool interactor_execution_success = process::parse_result(
             process_group_result,
             interactor_result,
-            *result.
-                mutable_judge()->
+            *judge.
                 mutable_utilities()->
                 mutable_interactor()->
                 mutable_execution()
         );
+        const bacs::process::ExecutionResult &interactor_execution =
+            result.judge().utilities().interactor().execution();
+        judge.mutable_utilities()->mutable_interactor()->set_output(
+            bacs::system::file::read_first(interactor_log.path(), MAX_MESSAGE_SIZE));
 
-        // logging
-        const auto add_log =
-            [&](const std::string &id, const boost::filesystem::path &path)
-            {
-                bacs::file::Range range;
-                range.set_whence(bacs::file::Range::BEGIN);
-                range.set_offset(0);
-                range.set_size(MAX_MESSAGE_SIZE);
-
-                problem::single::result::File &file = *result.add_file();
-                file.set_id(id);
-                *file.mutable_data() = bacs::system::file::read(path, range);
-            };
-        add_log("log.broker", broker_log.path());
-        add_log("log.interactor", interactor_log.path());
-
-        // utilities
         problem::single::result::Judge::AuxiliaryUtility &broker_utility =
-            *result.mutable_judge()->mutable_utilities()->add_auxiliary();
+            *judge.mutable_utilities()->add_auxiliary();
         broker_utility.set_name("broker");
         const bool broker_execution_success = process::parse_result(
             process_group_result,
@@ -261,13 +250,10 @@ namespace bacs{namespace system{namespace single
         );
         const bacs::process::ExecutionResult &broker_execution =
             broker_utility.utility().execution();
+        broker_utility.mutable_utility()->set_output(
+            bacs::system::file::read_first(broker_log.path(), MAX_MESSAGE_SIZE));
 
         // analyze
-        const bacs::process::ExecutionResult &interactor_execution =
-            result.judge().utilities().interactor().execution();
-
-        problem::single::result::Judge &judge = *result.mutable_judge();
-
         if (!broker_execution.has_exit_status())
             goto failed_;
         switch (broker_execution.status())
