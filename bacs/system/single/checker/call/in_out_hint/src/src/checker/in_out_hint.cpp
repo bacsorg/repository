@@ -2,6 +2,7 @@
 
 #include <bacs/system/single/testing.hpp>
 
+#include <bacs/system/file.hpp>
 #include <bacs/system/process.hpp>
 
 #include <yandex/contest/invoker/All.hpp>
@@ -65,14 +66,23 @@ namespace bacs{namespace system{namespace single
         process->setStream(2, FdAlias(1));
         process->setStream(1, File(checking_log, AccessMode::WRITE_ONLY));
         // TODO process->setResourceLimits()
+
         // execute
         const ProcessGroup::Result process_group_result =
             process_group->synchronizedCall();
+
+        // process result
         const Process::Result process_result = process->result();
         const bool success = process::parse_result(
             process_group_result,
             process_result,
             *result.mutable_utilities()->mutable_checker()->mutable_execution()
+        );
+        result.mutable_utilities()->mutable_checker()->set_output(
+            bacs::system::file::read_first(
+                pimpl->container->filesystem().keepInRoot(checking_log),
+                1024 * 1024
+            )
         );
         const bacs::process::ExecutionResult &checker_execution =
             result.utilities().checker().execution();
