@@ -97,6 +97,18 @@ namespace bacs{namespace system{namespace single
         const boost::filesystem::path interactor_log_path =
             logging_path / interactor_log.path().filename();
 
+        const bunsan::tempfile judge_to_solution_log =
+            bunsan::tempfile::regular_file_in_directory(container_logging_path);
+        const boost::filesystem::path judge_to_solution_log_path =
+            logging_path / judge_to_solution_log.path().filename();
+        pimpl->container->filesystem().setMode(judge_to_solution_log_path, 0600);
+
+        const bunsan::tempfile solution_to_judge_log =
+            bunsan::tempfile::regular_file_in_directory(container_logging_path);
+        const boost::filesystem::path solution_to_judge_log_path =
+            logging_path / solution_to_judge_log.path().filename();
+        pimpl->container->filesystem().setMode(solution_to_judge_log_path, 0600);
+
         // initialize process
         const ProcessGroupPointer process_group =
             pimpl->container->createProcessGroup();
@@ -124,7 +136,9 @@ namespace bacs{namespace system{namespace single
             "--solution-source", "6",
             "--solution-sink", "7",
             "--output-limit-bytes", "67108864", // FIXME
-            "--termination-real-time-limit-millis", "4000" // FIXME
+            "--termination-real-time-limit-millis", "4000", // FIXME
+            "--dump-judge", judge_to_solution_log_path.string(),
+            "--dump-solution", solution_to_judge_log_path.string()
         );
 
         ProcessEnvironment env = interactor->environment();
@@ -225,6 +239,24 @@ namespace bacs{namespace system{namespace single
             solution_result,
             *result.mutable_execution()
         );
+
+        const auto read_file =
+            [&](problem::single::result::File &rfile,
+                const problem::single::settings::File &file,
+                const boost::filesystem::path &path)
+            {
+                rfile.set_id(file.id());
+                *rfile.mutable_data() =
+                    bacs::system::file::read(path, file.receive());
+            };
+
+        for (const problem::single::settings::File &file: settings.file())
+        {
+            if (file.id() == "stdin" && file.has_receive())
+                read_file(*result.add_file(), file, judge_to_solution_log.path());
+            if (file.id() == "stdout" && file.has_receive())
+                read_file(*result.add_file(), file, solution_to_judge_log.path());
+        }
 
         // utilities
         const bool interactor_execution_success = process::parse_result(
