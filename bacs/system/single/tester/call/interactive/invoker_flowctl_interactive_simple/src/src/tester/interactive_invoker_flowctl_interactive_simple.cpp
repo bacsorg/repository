@@ -27,7 +27,7 @@ namespace bacs{namespace system{namespace single
     static const boost::filesystem::path logging_path = "/logging";
 
     static const unistd::access::Id SOLUTION_OWNER_ID(1000, 1000);
-    static const unistd::access::Id INTERACTOR_OWNER_ID(1000, 1000);
+    static const unistd::access::Id JUDGE_OWNER_ID(1000, 1000);
 
     constexpr std::size_t MAX_MESSAGE_SIZE = 1024 * 1024;
 
@@ -83,9 +83,15 @@ namespace bacs{namespace system{namespace single
             testing_path / tmpdir.path().filename();
         pimpl->container->filesystem().setOwnerId(
             current_path,
-            INTERACTOR_OWNER_ID
+            JUDGE_OWNER_ID
         );
         pimpl->container->filesystem().setMode(current_path, 0500);
+
+        pimpl->container->filesystem().setOwnerId(
+            logging_path,
+            JUDGE_OWNER_ID
+        );
+        pimpl->container->filesystem().setMode(logging_path, 0500);
 
         const bunsan::tempfile broker_log =
             bunsan::tempfile::regular_file_in_directory(container_logging_path);
@@ -101,12 +107,20 @@ namespace bacs{namespace system{namespace single
             bunsan::tempfile::regular_file_in_directory(container_logging_path);
         const boost::filesystem::path judge_to_solution_log_path =
             logging_path / judge_to_solution_log.path().filename();
+        pimpl->container->filesystem().setOwnerId(
+            judge_to_solution_log_path,
+            JUDGE_OWNER_ID
+        );
         pimpl->container->filesystem().setMode(judge_to_solution_log_path, 0600);
 
         const bunsan::tempfile solution_to_judge_log =
             bunsan::tempfile::regular_file_in_directory(container_logging_path);
         const boost::filesystem::path solution_to_judge_log_path =
             logging_path / solution_to_judge_log.path().filename();
+        pimpl->container->filesystem().setOwnerId(
+            solution_to_judge_log_path,
+            JUDGE_OWNER_ID
+        );
         pimpl->container->filesystem().setMode(solution_to_judge_log_path, 0600);
 
         // initialize process
@@ -137,8 +151,8 @@ namespace bacs{namespace system{namespace single
             "--solution-sink", "7",
             "--output-limit-bytes", "67108864", // FIXME
             "--termination-real-time-limit-millis", "4000", // FIXME
-            "--dump-judge", judge_to_solution_log_path.string(),
-            "--dump-solution", solution_to_judge_log_path.string()
+            "--dump-judge", judge_to_solution_log_path,
+            "--dump-solution", solution_to_judge_log_path
         );
 
         ProcessEnvironment env = interactor->environment();
@@ -192,7 +206,7 @@ namespace bacs{namespace system{namespace single
         const boost::filesystem::path test_in = current_path / "in";
         env["JUDGE_TEST_IN"] = test_in.string();
         test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
-        pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setOwnerId(test_in, JUDGE_OWNER_ID);
         pimpl->container->filesystem().setMode(test_in, 0400);
 
         if (data_set.find("out") != data_set.end())
@@ -200,27 +214,28 @@ namespace bacs{namespace system{namespace single
             const boost::filesystem::path test_in = current_path / "hint";
             env["JUDGE_TEST_HINT"] = test_in.string();
             test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
-            pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
+            pimpl->container->filesystem().setOwnerId(test_in, JUDGE_OWNER_ID);
             pimpl->container->filesystem().setMode(test_in, 0600);
         }
 
         const boost::filesystem::path interactor_output = current_path / "output";
         env["JUDGE_INTERACTOR_OUTPUT"] = interactor_output.string();
         detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_output));
-        pimpl->container->filesystem().setOwnerId(interactor_output, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setOwnerId(interactor_output, JUDGE_OWNER_ID);
         pimpl->container->filesystem().setMode(interactor_output, 0600);
 
         const boost::filesystem::path interactor_custom_message = current_path / "custom_message";
         env["JUDGE_INTERACTOR_CUSTOM_MESSAGE"] = interactor_custom_message.string();
         detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_custom_message));
-        pimpl->container->filesystem().setOwnerId(interactor_custom_message, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setOwnerId(interactor_custom_message, JUDGE_OWNER_ID);
         pimpl->container->filesystem().setMode(interactor_custom_message, 0600);
 
         interactor->setEnvironment(env);
 
         // execution
+        broker->setOwnerId(JUDGE_OWNER_ID);
+        interactor->setOwnerId(JUDGE_OWNER_ID);
         solution->setOwnerId(SOLUTION_OWNER_ID);
-        interactor->setOwnerId(INTERACTOR_OWNER_ID);
         // note: ignore current_path from settings.execution()
         // note: current path is not used
         // note: arguments is already set
