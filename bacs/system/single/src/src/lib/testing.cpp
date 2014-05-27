@@ -117,6 +117,7 @@ namespace bacs{namespace system{namespace single
     {
         m_intermediate.set_test_group_id(test_group.id());
         result.set_id(test_group.id());
+        result.set_executed(true);
         const problem::single::settings::TestGroupSettings &settings =
             test_group.settings();
         const std::unordered_set<std::string> test_set =
