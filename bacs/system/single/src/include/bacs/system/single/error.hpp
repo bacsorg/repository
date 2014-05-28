@@ -1,10 +1,10 @@
 #pragma once
 
-#include <bunsan/error.hpp>
+#include <bacs/system/error.hpp>
 
 namespace bacs{namespace system{namespace single
 {
-    struct error: virtual bunsan::error {};
+    struct error: virtual bacs::system::error {};
 
     struct invalid_argument_error: virtual error
     {
