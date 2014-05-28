@@ -5,6 +5,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/scope_exit.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -100,16 +101,115 @@ namespace bacs{namespace system{namespace single
         m_result_cb.call(m_result);
     }
 
+    namespace
+    {
+        bool satisfies_requirement(
+            const problem::single::result::TestGroupResult &result,
+            const problem::single::testing::Dependency::Requirement requirement)
+        {
+            using problem::single::testing::Dependency;
+            using problem::single::result::TestResult;
+
+            BOOST_ASSERT(result.has_executed());
+            if (!result.executed())
+                return false;
+
+            std::size_t all_number = 0, ok_number = 0, fail_number = 0;
+            for (const TestResult &test: result.test())
+            {
+                ++all_number;
+                if (test.status() == TestResult::OK)
+                    ++ok_number;
+                else
+                    ++fail_number;
+            }
+
+            switch (requirement)
+            {
+            case Dependency::ALL_OK:
+                return ok_number == all_number;
+            case Dependency::ALL_FAIL:
+                return fail_number == all_number;
+            case Dependency::AT_LEAST_ONE_OK:
+                return ok_number >= 1;
+            case Dependency::AT_MOST_ONE_FAIL:
+                return fail_number >= 1;
+            case Dependency::AT_LEAST_HALF_OK:
+                return ok_number * 2 >= all_number;
+            default:
+                BOOST_ASSERT(false);
+            }
+        }
+    }
+
     void testing::test(const problem::single::testing::SolutionTesting &testing,
                        problem::single::result::SolutionTestingResult &result)
     {
+        using problem::single::testing::TestGroup;
+        using problem::single::testing::Dependency;
+        using problem::single::result::TestGroupResult;
+
         m_intermediate.set_state(problem::single::intermediate::TESTING);
-        // TODO test group dependencies
-        for (const problem::single::testing::TestGroup &test_group:
-                testing.test_group())
+
+        std::unordered_map<std::string, const TestGroup *> test_groups;
+        std::unordered_map<std::string, TestGroupResult *> results;
+
+        for (const TestGroup &test_group: testing.test_group())
         {
-            test(test_group, *result.add_test_group());
+            test_groups[test_group.id()] = &test_group;
+            TestGroupResult &r = *result.add_test_group();
+            results[test_group.id()] = &r;
+            r.set_id(test_group.id());
         }
+
+        std::unordered_set<std::string> in_test_group;
+        const std::function<void (const TestGroup &)> run =
+            [&](const TestGroup &test_group)
+            {
+                if (in_test_group.find(test_group.id()) != in_test_group.end())
+                    BOOST_THROW_EXCEPTION(
+                        test_group_circular_dependencies_error() <<
+                        test_group_circular_dependencies_error::
+                            test_group(test_group.id()));
+                in_test_group.insert(test_group.id());
+                BOOST_SCOPE_EXIT_ALL(&)
+                {
+                    in_test_group.erase(test_group.id());
+                };
+
+                TestGroupResult &result = *results.at(test_group.id());
+
+                if (result.has_executed())
+                    return;
+
+                for (const Dependency &dependency: test_group.dependency())
+                {
+                    const auto iter = test_groups.find(dependency.test_group());
+                    if (iter == test_groups.end())
+                        BOOST_THROW_EXCEPTION(
+                            test_group_dependency_not_found_error() <<
+                            test_group_dependency_not_found_error::
+                                test_group(test_group.id()) <<
+                            test_group_dependency_not_found_error::
+                                test_group_dependency(dependency.test_group()));
+                    const TestGroup &dep_test_group = *iter->second;
+
+                    run(dep_test_group);
+
+                    const TestGroupResult &dep_result =
+                        *results.at(dependency.test_group());
+                    if (!satisfies_requirement(dep_result, dependency.requirement()))
+                    {
+                        result.set_executed(false);
+                        return;
+                    }
+                }
+                result.set_executed(true);
+                test(test_group, result);
+            };
+
+        for (const TestGroup &test_group: testing.test_group())
+            run(test_group);
     }
 
     bool testing::test(const problem::single::testing::TestGroup &test_group,
