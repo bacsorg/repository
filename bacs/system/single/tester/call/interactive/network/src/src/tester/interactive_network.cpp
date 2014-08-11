@@ -1,6 +1,7 @@
 #include <bacs/system/single/tester.hpp>
 
 #include <bacs/system/builder.hpp>
+#include <bacs/system/file.hpp>
 #include <bacs/system/single/error.hpp>
 #include <bacs/system/single/detail/file.hpp>
 #include <bacs/system/single/testing.hpp>
@@ -24,6 +25,8 @@ namespace bacs{namespace system{namespace single
 
     static const unistd::access::Id SOLUTION_OWNER_ID(1000, 1000);
     static const unistd::access::Id INTERACTOR_OWNER_ID(1000, 1000);
+
+    constexpr std::size_t MAX_MESSAGE_SIZE = 1024 * 1024;
 
     class tester::impl
     {
@@ -100,37 +103,35 @@ namespace bacs{namespace system{namespace single
         for (const std::string &data_id: test_.data_set())
             test_files[data_id] = test_.location(data_id);
 
-        {
-            const auto data_set = test_.data_set();
+        const auto data_set = test_.data_set();
 
-            BOOST_ASSERT(data_set.find("in") != data_set.end());
-            const boost::filesystem::path test_in = current_path / "in";
-            env["JUDGE_TEST_IN"] = test_in.string();
+        BOOST_ASSERT(data_set.find("in") != data_set.end());
+        const boost::filesystem::path test_in = current_path / "in";
+        env["JUDGE_TEST_IN"] = test_in.string();
+        test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
+        pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setMode(test_in, 0500);
+
+        if (data_set.find("out") != data_set.end())
+        {
+            const boost::filesystem::path test_in = current_path / "hint";
+            env["JUDGE_TEST_HINT"] = test_in.string();
             test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
             pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
             pimpl->container->filesystem().setMode(test_in, 0500);
-
-            if (data_set.find("out") != data_set.end())
-            {
-                const boost::filesystem::path test_in = current_path / "hint";
-                env["JUDGE_TEST_HINT"] = test_in.string();
-                test_.copy("in", pimpl->container->filesystem().keepInRoot(test_in));
-                pimpl->container->filesystem().setOwnerId(test_in, INTERACTOR_OWNER_ID);
-                pimpl->container->filesystem().setMode(test_in, 0500);
-            }
-
-            const boost::filesystem::path interactor_output = current_path / "output";
-            env["JUDGE_INTERACTOR_OUTPUT"] = interactor_output.string();
-            detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_output));
-            pimpl->container->filesystem().setOwnerId(interactor_output, INTERACTOR_OWNER_ID);
-            pimpl->container->filesystem().setMode(interactor_output, 0500);
-
-            const boost::filesystem::path interactor_custom_message = current_path / "custom_message";
-            env["JUDGE_INTERACTOR_CUSTOM_MESSAGE"] = interactor_custom_message.string();
-            detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_custom_message));
-            pimpl->container->filesystem().setOwnerId(interactor_custom_message, INTERACTOR_OWNER_ID);
-            pimpl->container->filesystem().setMode(interactor_custom_message, 0500);
         }
+
+        const boost::filesystem::path interactor_output = current_path / "output";
+        env["JUDGE_INTERACTOR_OUTPUT"] = interactor_output.string();
+        detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_output));
+        pimpl->container->filesystem().setOwnerId(interactor_output, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setMode(interactor_output, 0500);
+
+        const boost::filesystem::path interactor_custom_message = current_path / "custom_message";
+        env["JUDGE_INTERACTOR_CUSTOM_MESSAGE"] = interactor_custom_message.string();
+        detail::file::touch(pimpl->container->filesystem().keepInRoot(interactor_custom_message));
+        pimpl->container->filesystem().setOwnerId(interactor_custom_message, INTERACTOR_OWNER_ID);
+        pimpl->container->filesystem().setMode(interactor_custom_message, 0500);
 
         interactor->setEnvironment(env);
 
@@ -140,12 +141,15 @@ namespace bacs{namespace system{namespace single
         // note: ignore current_path from settings.execution()
         // note: current path is not used
         // note: arguments is already set
+
         // execute
         const ProcessGroup::Result process_group_result = process_group->synchronizedCall();
         const Process::Result process_result = process->result();
         const Process::Result interactor_result = interactor->result();
-        const Process::Result pipectl_result = pipectl->result();
+
         // fill result
+        problem::single::result::Judge &judge = *result.mutable_judge();
+
         const bool execution_success = process::parse_result(
             process_group_result, process_result, *result.mutable_execution());
 
