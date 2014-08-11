@@ -18,7 +18,7 @@ foreach(lib ${libraries})
     list(APPEND dot_net_libs ${lib_path})
 endforeach()
 add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/${target}/bin/${target}
-    COMMAND bunsan_bacs_system_builders_mono_develop_build
+    COMMAND bunsan_bacs_system_build_mono_develop
             --fhs
             --output ${PROJECT_BINARY_DIR}/${target}
             --executable ${target}
