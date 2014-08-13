@@ -22,6 +22,7 @@ namespace bacs{namespace system{namespace single
     namespace unistd = yandex::contest::system::unistd;
 
     static const boost::filesystem::path testing_path = "/testing";
+    static const boost::filesystem::path logging_path = "/logging";
 
     static const unistd::access::Id SOLUTION_OWNER_ID(1000, 1000);
     static const unistd::access::Id INTERACTOR_OWNER_ID(1000, 1000);
@@ -68,12 +69,29 @@ namespace bacs{namespace system{namespace single
         const boost::filesystem::path container_testing_path =
             pimpl->container->filesystem().keepInRoot(testing_path);
         boost::filesystem::create_directories(container_testing_path);
+
+        const boost::filesystem::path container_logging_path =
+            pimpl->container->filesystem().keepInRoot(logging_path);
+        boost::filesystem::create_directories(container_logging_path);
+
         // initialize working directory
         const bunsan::tempfile tmpdir =
             bunsan::tempfile::directory_in_directory(container_testing_path);
         const boost::filesystem::path current_path = testing_path / tmpdir.path().filename();
         pimpl->container->filesystem().setOwnerId(current_path, INTERACTOR_OWNER_ID);
         pimpl->container->filesystem().setMode(current_path, 0500);
+
+        pimpl->container->filesystem().setOwnerId(
+            logging_path,
+            INTERACTOR_OWNER_ID
+        );
+        pimpl->container->filesystem().setMode(logging_path, 0500);
+
+        const bunsan::tempfile interactor_log =
+            bunsan::tempfile::regular_file_in_directory(container_logging_path);
+        const boost::filesystem::path interactor_log_path =
+            logging_path / interactor_log.path().filename();
+
         // initialize process
         const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
 
@@ -135,6 +153,9 @@ namespace bacs{namespace system{namespace single
 
         interactor->setEnvironment(env);
 
+        // logging
+        interactor->setStream(2, File(interactor_log_path, AccessMode::WRITE_ONLY));
+
         // execution
         process->setOwnerId(SOLUTION_OWNER_ID);
         interactor->setOwnerId(INTERACTOR_OWNER_ID);
@@ -160,6 +181,8 @@ namespace bacs{namespace system{namespace single
         );
         const bacs::process::ExecutionResult &interactor_execution =
             judge.utilities().interactor().execution();
+        judge.mutable_utilities()->mutable_interactor()->set_output(
+            bacs::system::file::read_first(interactor_log.path(), MAX_MESSAGE_SIZE));
 
         // analyze
         if (result.execution().status() ==
