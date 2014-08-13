@@ -97,12 +97,14 @@ namespace bacs{namespace system{namespace single
 
         const ProcessPointer process = pimpl->solution->create(
             process_group, settings.execution().argument());
+        process->setName("solution");
         system::process::setup(process_group, process, settings.resource_limits());
         process->setTerminateGroupOnCrash(false);
         process->setGroupWaitsForTermination(false);
 
         const ProcessPointer interactor =
             process_group->createProcess(testing::PROBLEM_BIN / "interactor");
+        interactor->setName("interactor");
         interactor->setTerminateGroupOnCrash(true);
 
         // notifier
