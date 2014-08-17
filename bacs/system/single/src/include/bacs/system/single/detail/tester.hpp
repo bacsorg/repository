@@ -16,6 +16,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/noncopyable.hpp>
 
+#include <utility>
+
 namespace bacs{namespace system{namespace single{namespace detail
 {
     using namespace yandex::contest::invoker;
@@ -75,6 +77,12 @@ namespace bacs{namespace system{namespace single{namespace detail
             m_test_files.clear();
             m_solution_files.clear();
             m_container_solution_files.clear();
+        }
+
+        template <typename ... Args>
+        ProcessPointer create_process(Args &&...args)
+        {
+            return m_process_group->createProcess(std::forward<Args>(args)...);
         }
 
         boost::filesystem::path create_directory(
@@ -202,6 +210,35 @@ namespace bacs{namespace system{namespace single{namespace detail
             );
             m_container->filesystem().setOwnerId(destination, owner_id);
             m_container->filesystem().setMode(destination, mode);
+        }
+
+        std::string read(const boost::filesystem::path &path,
+                         const bacs::file::Range &range)
+        {
+            return bacs::system::file::read(
+                m_container->filesystem().keepInRoot(path),
+                range
+            );
+        }
+
+        std::string read_first(
+            const boost::filesystem::path &path,
+            const std::uint64_t size)
+        {
+            return bacs::system::file::read_first(
+                m_container->filesystem().keepInRoot(path),
+                size
+            );
+        }
+
+        std::string read_last(
+            const boost::filesystem::path &path,
+            const std::uint64_t size)
+        {
+            return bacs::system::file::read_last(
+                m_container->filesystem().keepInRoot(path),
+                size
+            );
         }
 
         void send_file(
