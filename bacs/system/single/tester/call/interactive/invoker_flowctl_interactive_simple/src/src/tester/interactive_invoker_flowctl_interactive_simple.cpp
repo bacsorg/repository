@@ -321,7 +321,8 @@ namespace bacs{namespace system{namespace single
                     judge.set_status(
                         problem::single::result::Judge::TERMINATION_REAL_TIME_LIMIT_EXCEEDED);
                 }
-                else if (interactor_execution.exit_status() == 0)
+                else if (return_cast(interactor_execution.exit_status()) ==
+                         problem::single::result::Judge::OK)
                 {
                     if (result.execution().status() == bacs::process::ExecutionResult::OK)
                         judge.set_status(
@@ -338,45 +339,19 @@ namespace bacs{namespace system{namespace single
             broker_ok_:
                 if (!interactor_execution.has_exit_status())
                     goto failed_;
-                switch (interactor_execution.exit_status())
+                judge.set_status(return_cast(interactor_execution.exit_status()));
+                switch (judge.status())
                 {
-                case 0:
-                    judge.set_status(problem::single::result::Judge::OK);
-                    break;
-                case 1:
-                    judge.set_status(problem::single::result::Judge::WRONG_ANSWER);
-                    break;
-                case 2:
-                    judge.set_status(problem::single::result::Judge::PRESENTATION_ERROR);
-                    break;
-                case 3:
-                    judge.set_status(problem::single::result::Judge::QUERIES_LIMIT_EXCEEDED);
-                    break;
-                case 4:
-                    judge.set_status(problem::single::result::Judge::INCORRECT_REQUEST);
-                    break;
-                case 5:
-                    if (result.execution().status() == bacs::process::ExecutionResult::OK)
-                        judge.set_status(problem::single::result::Judge::INSUFFICIENT_DATA);
-                    else
+                case problem::single::result::Judge::INSUFFICIENT_DATA:
+                    if (result.execution().status() != bacs::process::ExecutionResult::OK)
                         judge.set_status(problem::single::result::Judge::SKIPPED);
                     break;
-                case 100:
-                    judge.set_status(problem::single::result::Judge::CUSTOM_FAILURE);
-                    judge.set_message(
-                        bacs::system::file::read_first(
-                            pimpl->container->filesystem().keepInRoot(
-                                interactor_custom_message
-                            ),
-                            MAX_MESSAGE_SIZE
-                        )
-                    );
+                case problem::single::result::Judge::CUSTOM_FAILURE:
+                    judge.set_message(pimpl->read_first(
+                        interactor_custom_message,
+                        MAX_MESSAGE_SIZE
+                    ));
                     break;
-                case 200:
-                    judge.set_status(problem::single::result::Judge::FAIL_TEST);
-                    break;
-                default:
-                    judge.set_status(problem::single::result::Judge::FAILED);
                 }
                 break;
             case Broker::SOLUTION_OUTPUT_LIMIT_EXCEEDED:

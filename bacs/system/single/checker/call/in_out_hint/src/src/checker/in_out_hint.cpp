@@ -93,27 +93,9 @@ namespace bacs{namespace system{namespace single
             break;
         case bacs::process::ExecutionResult::ABNORMAL_EXIT:
             if (checker_execution.has_exit_status())
-            {
-                switch (checker_execution.exit_status())
-                {
-                case 0:
-                    result.set_status(problem::single::result::Judge::OK);
-                    break;
-                case 2:
-                case 5:
-                    result.set_status(problem::single::result::Judge::WRONG_ANSWER);
-                    break;
-                case 4:
-                    result.set_status(problem::single::result::Judge::PRESENTATION_ERROR);
-                    break;
-                default:
-                    result.set_status(problem::single::result::Judge::FAILED);
-                }
-            }
+                result.set_status(return_cast(checker_execution.exit_status()));
             else
-            {
                 result.set_status(problem::single::result::Judge::FAILED);
-            }
             break;
         case bacs::process::ExecutionResult::MEMORY_LIMIT_EXCEEDED:
         case bacs::process::ExecutionResult::TIME_LIMIT_EXCEEDED:

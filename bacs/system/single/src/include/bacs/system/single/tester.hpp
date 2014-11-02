@@ -22,6 +22,9 @@ namespace bacs{namespace system{namespace single
     class tester: private boost::noncopyable
     {
     public:
+        static problem::single::result::Judge::Status return_cast(const int exit_status);
+
+    public:
         explicit tester(
             const yandex::contest::invoker::ContainerPointer &container);
         ~tester();
