@@ -161,16 +161,6 @@ const char* latestFeatures[] = {
 #define SPACE ((char)' ')
 #define EOFC ((char)26)
 
-// BACS defines
-#define OK_EXIT_CODE 0
-#define WA_EXIT_CODE 2
-#define PE_EXIT_CODE 4
-#define FAIL_EXIT_CODE 6
-#define DIRT_EXIT_CODE 6
-#define POINTS_EXIT_CODE 7
-#define PC_BASE_EXIT_CODE 0
-// end of BACS defines
-
 #ifndef OK_EXIT_CODE
 #   define OK_EXIT_CODE 0
 #endif

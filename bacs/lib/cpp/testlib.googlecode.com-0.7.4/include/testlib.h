@@ -131,13 +131,21 @@ const char* latestFeatures[] = {
 #define SPACE ((char)' ')
 #define EOFC ((char)26)
 
+#ifndef EJUDGE
 #define OK_EXIT_CODE 0
-#define WA_EXIT_CODE 2
+#define WA_EXIT_CODE 1
+#define PE_EXIT_CODE 2
+#define FAIL_EXIT_CODE 3
+#define DIRT_EXIT_CODE 4
+#define PC_BASE_EXIT_CODE 0
+#else
+#define OK_EXIT_CODE 0
+#define WA_EXIT_CODE 5
 #define PE_EXIT_CODE 4
 #define FAIL_EXIT_CODE 6
 #define DIRT_EXIT_CODE 6
-#define POINTS_EXIT_CODE 7
 #define PC_BASE_EXIT_CODE 0
+#endif
 
 #ifdef TESTSYS
 #undef PC_BASE_EXIT_CODE
