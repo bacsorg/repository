@@ -4,7 +4,7 @@ namespace bacs{namespace system{namespace single
 {
     problem::single::result::Judge::Status tester::return_cast(const int exit_status)
     {
-        switch (interactor_execution.exit_status())
+        switch (exit_status)
         {
         case 0:
             return problem::single::result::Judge::OK;
