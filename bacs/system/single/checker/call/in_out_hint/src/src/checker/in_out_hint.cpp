@@ -15,7 +15,8 @@ namespace bacs{namespace system{namespace single
     using namespace yandex::contest::invoker;
     namespace unistd = yandex::contest::system::unistd;
 
-    const unistd::access::Id ownerId(1000, 1000);
+    static const boost::filesystem::path checking_path = "/checking";
+    static const unistd::access::Id owner_id(1000, 1000);
 
     class checker::impl
     {
@@ -36,9 +37,17 @@ namespace bacs{namespace system{namespace single
         const file_map &solution_files,
         problem::single::result::Judge &result)
     {
-        const boost::filesystem::path checking_path = testing::PROBLEM_ROOT;
+        // files
+        const boost::filesystem::path container_checking_path =
+            pimpl->container->filesystem().keepInRoot(checking_path);
+        boost::filesystem::create_directories(container_checking_path);
         const boost::filesystem::path checking_log = checking_path / "log";
+        const boost::filesystem::path container_checking_log =
+            pimpl->container->filesystem().keepInRoot(checking_log);
 
+        // permissions
+        pimpl->container->filesystem().setOwnerId(checking_path, owner_id);
+        pimpl->container->filesystem().setMode(checking_path, 0500);
         const boost::filesystem::path in = test_files.at("in");
         const boost::filesystem::path out = solution_files.at("stdout");
         const auto hint_iter = test_files.find("out");
@@ -51,16 +60,21 @@ namespace bacs{namespace system{namespace single
             (hint_iter != test_files.end() && test_files.size() == 2),
             "keys(test_files) == {'in', 'out'} || keys(test_files) == {'in'}"
         );
-        const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
-        // TODO process_group->setResourceLimits()
-        const ProcessPointer process = process_group->createProcess(testing::PROBLEM_BIN / "checker");
-        pimpl->container->filesystem().push(in, checking_path / "in", {0, 0}, 0444);
-        pimpl->container->filesystem().push(out, checking_path / "out", {0, 0}, 0444);
+        pimpl->container->filesystem().push(in, checking_path / "in", owner_id, 0600);
+        pimpl->container->filesystem().push(out, checking_path / "out", owner_id, 0600);
         if (hint_iter != test_files.end())
         {
             pimpl->container->filesystem().push(
-                hint_iter->second, checking_path / "hint", {0, 0}, 0444);
+                hint_iter->second, checking_path / "hint", owner_id, 0600
+            );
         }
+
+        const ProcessGroupPointer process_group = pimpl->container->createProcessGroup();
+        // TODO process_group->setResourceLimits()
+
+        // execution
+        const ProcessPointer process = process_group->createProcess(testing::PROBLEM_BIN / "checker");
+        process->setOwnerId(owner_id);
         process->setArguments(process->executable(), "in", "out", hint_arg);
         process->setCurrentPath(checking_path);
         process->setStream(2, FdAlias(1));
@@ -79,10 +93,7 @@ namespace bacs{namespace system{namespace single
             *result.mutable_utilities()->mutable_checker()->mutable_execution()
         );
         result.mutable_utilities()->mutable_checker()->set_output(
-            bacs::system::file::read_first(
-                pimpl->container->filesystem().keepInRoot(checking_log),
-                1024 * 1024
-            )
+            bacs::system::file::read_first(container_checking_log, 1024 * 1024)
         );
         const bacs::process::ExecutionResult &checker_execution =
             result.utilities().checker().execution();
