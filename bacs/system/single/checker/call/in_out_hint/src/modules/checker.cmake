@@ -1,1 +1,3 @@
-list(APPEND sources src/checker/in_out_hint.cpp)
+list(APPEND bacs_sources
+    src/checker/in_out_hint.cpp
+)

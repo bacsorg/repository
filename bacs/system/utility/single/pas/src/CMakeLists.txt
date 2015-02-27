@@ -1,6 +1,6 @@
 project(bunsan_bacs_utility_single_pas)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 file(GLOB_RECURSE modules ${CMAKE_SOURCE_DIR}/modules/*.cmake)
 foreach(module ${modules})

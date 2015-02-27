@@ -1,1 +1,3 @@
-list(APPEND sources src/checker_return/ejudge.cpp)
+list(APPEND bacs_sources
+    src/checker_return/ejudge.cpp
+)

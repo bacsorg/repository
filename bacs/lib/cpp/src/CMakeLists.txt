@@ -1,6 +1,6 @@
 project(bunsan_bacs_lib_cpp)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 #file(GLOB sources src/*.cpp src/*.cc)
 file(GLOB includes include/*.h include/*.hpp)

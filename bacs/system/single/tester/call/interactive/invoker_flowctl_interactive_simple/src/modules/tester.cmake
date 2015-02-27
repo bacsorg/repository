@@ -1,5 +1,7 @@
-list(APPEND sources
+list(APPEND bacs_sources
     src/tester/interactive_invoker_flowctl_interactive_simple.cpp
 )
 
-bunsan_use(yandex_contest_invoker_flowctl_interactive)
+bunsan_find_bunsan_package(yandex_contest_invoker_flowctl_interactive yandex_contest_invoker_flowctl_interactive)
+list(APPEND bacs_include_dirs ${yandex_contest_invoker_flowctl_interactive_INCLUDE_DIRS})
+list(APPEND bacs_libraries ${yandex_contest_invoker_flowctl_interactive_LIBRARIES})

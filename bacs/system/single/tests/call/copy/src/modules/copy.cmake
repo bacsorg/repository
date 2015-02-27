@@ -1,1 +1,3 @@
-list(APPEND sources src/tests/copy.cpp)
+list(APPEND bacs_sources
+    src/tests/copy.cpp
+)

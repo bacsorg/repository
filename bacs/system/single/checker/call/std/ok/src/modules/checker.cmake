@@ -1,3 +1,3 @@
-list(APPEND sources
+list(APPEND bacs_sources
     src/checker/ok.cpp
 )

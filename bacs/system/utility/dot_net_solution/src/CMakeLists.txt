@@ -1,6 +1,6 @@
 project(bunsan_bacs_utility_dot_net_solution)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 # Default values, may be overwritten in modules
 set(configuration Release)
