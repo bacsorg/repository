@@ -33,6 +33,8 @@ bunsan_use_bunsan_package(${PROJECT_NAME} bunsan_bacs_problem_single
     bunsan_bacs_problem_single
 )
 bunsan_use_bunsan_package(${PROJECT_NAME} yandex_contest_invoker yandex_contest_invoker)
+bunsan_use_bunsan_package(${PROJECT_NAME} bunsan_broker bunsan_broker)
+bunsan_use_bunsan_package(${PROJECT_NAME} bunsan_protobuf bunsan_protobuf)
 bunsan_use_boost(${PROJECT_NAME} regex)
 target_include_directories(${PROJECT_NAME} PRIVATE ${bacs_include_dirs})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${bacs_libraries})

@@ -2,6 +2,8 @@
 
 #include <yandex/contest/invoker/All.hpp>
 
+#include <bunsan/protobuf/binary.hpp>
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -49,15 +51,13 @@ namespace bacs{namespace system{namespace single
         return config;
     }
 
-    testing::testing(const problem::single::task::Callbacks &callbacks):
+    testing::testing(bunsan::broker::task::channel &channel):
+        m_channel(channel),
         m_container(Container::create(testing_config(
             ContainerConfig::fromEnvironment()))),
         m_checker(m_container),
-        m_tester(m_container),
-        m_result_cb(callbacks.result())
+        m_tester(m_container)
     {
-        if (callbacks.has_intermediate())
-            m_intermediate_cb.assign(callbacks.intermediate());
         m_intermediate.set_state(problem::single::intermediate::INITIALIZED);
         send_intermediate();
     }
@@ -93,12 +93,18 @@ namespace bacs{namespace system{namespace single
 
     void testing::send_intermediate()
     {
-        m_intermediate_cb.call(m_intermediate);
+        m_broker_status.set_code(0);
+        m_broker_status.clear_reason();
+        m_broker_status.set_data(bunsan::protobuf::binary::to_string(m_result));
+        m_channel.send_status(m_broker_status);
     }
 
     void testing::send_result()
     {
-        m_result_cb.call(m_result);
+        m_broker_result.set_status(bunsan::broker::Result::OK);
+        m_broker_result.clear_reason();
+        m_broker_result.set_data(bunsan::protobuf::binary::to_string(m_result));
+        m_channel.send_result(m_broker_result);
     }
 
     namespace

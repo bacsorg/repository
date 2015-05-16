@@ -6,6 +6,8 @@
 #include <yandex/contest/system/Trace.hpp>
 #include <yandex/contest/TypeInfo.hpp>
 
+#include <bunsan/broker/task/stream_channel.hpp>
+
 #include <boost/assert.hpp>
 
 #include <iostream>
@@ -23,7 +25,8 @@ int main(int argc, char *argv[])
         if (!task.ParseFromIstream(&std::cin))
             BOOST_THROW_EXCEPTION(bacs::system::single::error() <<
                                   bacs::system::single::error::message("Unable to parse task."));
-        testing testing_(task.callbacks());
+        bunsan::broker::task::stream_channel channel(std::cout);
+        testing testing_(channel);
         testing_.test(task.solution(), task.testing());
     }
     catch (std::exception &e)

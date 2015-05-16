@@ -1,15 +1,17 @@
 #pragma once
 
-#include <bacs/system/single/callback.hpp>
 #include <bacs/system/single/checker.hpp>
 #include <bacs/system/single/tester.hpp>
 #include <bacs/system/single/tests.hpp>
 
+#include <bacs/problem/single/intermediate.pb.h>
 #include <bacs/problem/single/result.pb.h>
 #include <bacs/problem/single/settings.pb.h>
 #include <bacs/problem/single/testing.pb.h>
 
 #include <yandex/contest/invoker/Forward.hpp>
+
+#include <bunsan/broker/task/channel.hpp>
 
 namespace bacs{namespace system{namespace single
 {
@@ -21,7 +23,7 @@ namespace bacs{namespace system{namespace single
         static const boost::filesystem::path PROBLEM_LIB;
 
     public:
-        explicit testing(const problem::single::task::Callbacks &callbacks);
+        explicit testing(bunsan::broker::task::channel &channel);
 
         void test(const bacs::process::Buildable &solution,
                   const problem::single::testing::SolutionTesting &testing);
@@ -55,12 +57,13 @@ namespace bacs{namespace system{namespace single
                   problem::single::result::TestResult &result);
 
     private:
+        bunsan::broker::task::channel &m_channel;
         yandex::contest::invoker::ContainerPointer m_container;
         tests m_tests;
         checker m_checker;
         tester m_tester;
-        callback::result m_result_cb;
-        callback::intermediate m_intermediate_cb;
+        bunsan::broker::Status m_broker_status;
+        bunsan::broker::Result m_broker_result;
         problem::single::intermediate::Result m_intermediate;
         problem::single::result::Result m_result;
     };
