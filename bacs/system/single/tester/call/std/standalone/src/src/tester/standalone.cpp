@@ -45,7 +45,7 @@ namespace bacs{namespace system{namespace single
         const bacs::process::Buildable &solution,
         bacs::process::BuildResult &result)
     {
-        pimpl->builder = builder::instance(solution.build_settings().builder());
+        pimpl->builder = builder::instance(solution.build_settings().config());
         pimpl->solution = pimpl->builder->build(
             pimpl->container(),
             OWNER_ID,
