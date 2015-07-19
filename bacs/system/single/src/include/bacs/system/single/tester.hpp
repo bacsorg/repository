@@ -16,29 +16,32 @@
 
 #include <memory>
 
-namespace bacs{namespace system{namespace single
-{
-    /// \note must be implemented in problem
-    class tester: private boost::noncopyable
-    {
-    public:
-        static problem::single::result::Judge::Status return_cast(const int exit_status);
+namespace bacs {
+namespace system {
+namespace single {
 
-    public:
-        explicit tester(
-            const yandex::contest::invoker::ContainerPointer &container);
-        ~tester();
+/// \note must be implemented in problem
+class tester : private boost::noncopyable {
+ public:
+  static problem::single::result::Judge::Status return_cast(int exit_status);
 
-        bool build(
-            const bacs::process::Buildable &solution,
-            bacs::process::BuildResult &result);
+ public:
+  explicit tester(const yandex::contest::invoker::ContainerPointer &container);
+  ~tester();
 
-        bool test(const problem::single::settings::ProcessSettings &settings,
-                  const single::test &test_,
-                  problem::single::result::TestResult &result);
-    private:
-        class impl;
+  bool build(const bacs::process::Buildable &solution,
+             bacs::process::BuildResult &result);
 
-        std::unique_ptr<impl> pimpl;
-    };
-}}}
+  bool test(const problem::single::settings::ProcessSettings &settings,
+            const single::test &test_,
+            problem::single::result::TestResult &result);
+
+ private:
+  class impl;
+
+  std::unique_ptr<impl> pimpl;
+};
+
+}  // namespace single
+}  // namespace system
+}  // namespace bacs

@@ -4,47 +4,48 @@
 
 #include <algorithm>
 
-namespace bacs{namespace system{namespace single{namespace detail{namespace file
-{
-    boost::filesystem::path to_path(const problem::single::settings::Path &path)
-    {
-        boost::filesystem::path p;
-        if (path.has_root())
-            p = path.root();
-        for (const std::string &element: path.element())
-            p /= element;
-        return p;
-    }
+namespace bacs {
+namespace system {
+namespace single {
+namespace detail {
+namespace file {
 
-    void touch(const boost::filesystem::path &path)
-    {
-        bunsan::filesystem::ofstream fout(path);
-        fout.close();
-    }
+boost::filesystem::path to_path(const problem::single::settings::Path &path) {
+  boost::filesystem::path p;
+  if (path.has_root()) p = path.root();
+  for (const std::string &element : path.element()) p /= element;
+  return p;
+}
 
-    mode_t mode(const problem::single::settings::File::Permissions &value)
-    {
-        switch (value)
-        {
-        case problem::single::settings::File::READ:
-            return 0444;
-        case problem::single::settings::File::WRITE:
-            return 0222;
-        case problem::single::settings::File::EXECUTE:
-            return 0111;
-        default:
-            BOOST_ASSERT(false);
-            return 0;
-        }
-    }
+void touch(const boost::filesystem::path &path) {
+  bunsan::filesystem::ofstream fout(path);
+  fout.close();
+}
 
-    mode_t mode(const google::protobuf::RepeatedField<int> &permissions)
-    {
-        mode_t m = 0;
-        for (const int p: permissions)
-        {
-            m |= mode(static_cast<problem::single::settings::File::Permissions>(p));
-        }
-        return m;
-    }
-}}}}}
+mode_t mode(const problem::single::settings::File::Permissions &value) {
+  switch (value) {
+    case problem::single::settings::File::READ:
+      return 0444;
+    case problem::single::settings::File::WRITE:
+      return 0222;
+    case problem::single::settings::File::EXECUTE:
+      return 0111;
+    default:
+      BOOST_ASSERT(false);
+      return 0;
+  }
+}
+
+mode_t mode(const google::protobuf::RepeatedField<int> &permissions) {
+  mode_t m = 0;
+  for (const int p : permissions) {
+    m |= mode(static_cast<problem::single::settings::File::Permissions>(p));
+  }
+  return m;
+}
+
+}  // namespace file
+}  // namespace detail
+}  // namespace single
+}  // namespace system
+}  // namespace bacs

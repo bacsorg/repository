@@ -10,67 +10,69 @@
 #include <string>
 #include <unordered_set>
 
-namespace bacs{namespace system{namespace single
-{
-    struct invalid_test_query_error: virtual error {};
+namespace bacs {
+namespace system {
+namespace single {
 
-    class test;
+struct invalid_test_query_error : virtual error {};
 
-    /// \note must be implemented in problem
-    class tests: private boost::noncopyable
-    {
-    public:
-        tests();
-        ~tests();
+class test;
 
-        void copy(const std::string &test_id, const std::string &data_id,
-                  const boost::filesystem::path &path);
+/// \note must be implemented in problem
+class tests : private boost::noncopyable {
+ public:
+  tests();
+  ~tests();
 
-        boost::filesystem::path location(
-            const std::string &test_id, const std::string &data_id);
+  void copy(const std::string &test_id, const std::string &data_id,
+            const boost::filesystem::path &path);
 
-        std::unordered_set<std::string> data_set();
+  boost::filesystem::path location(const std::string &test_id,
+                                   const std::string &data_id);
 
-        std::unordered_set<std::string> test_set();
+  std::unordered_set<std::string> data_set();
 
-        /// \note implemented
-        std::unordered_set<std::string> test_set(
-            const google::protobuf::RepeatedPtrField<
-                problem::single::testing::TestQuery> &test_query);
+  std::unordered_set<std::string> test_set();
 
-        /// \note implemented
-        single::test test(const std::string &test_id);
+  /// \note implemented
+  std::unordered_set<std::string> test_set(
+      const google::protobuf::RepeatedPtrField<
+          problem::single::testing::TestQuery> &test_query);
 
-    private:
-        class impl;
+  /// \note implemented
+  single::test test(const std::string &test_id);
 
-        impl *pimpl;
-    };
+ private:
+  class impl;
 
-    /*!
-     * Wrapper class for single test
-     *
-     * \warning Stores mutable reference to tests class.
-     */
-    class test
-    {
-    public:
-        test()=default;
-        test(const test &)=default;
-        test &operator=(const test &)=default;
+  std::unique_ptr<impl> pimpl;
+};
 
-        test(tests &tests_, const std::string &test_id);
+/*!
+ * Wrapper class for single test
+ *
+ * \warning Stores mutable reference to tests class.
+ */
+class test {
+ public:
+  test() = default;
+  test(const test &) = default;
+  test &operator=(const test &) = default;
 
-        void copy(
-            const std::string &data_id,
+  test(tests &tests_, const std::string &test_id);
+
+  void copy(const std::string &data_id,
             const boost::filesystem::path &path) const;
 
-        boost::filesystem::path location(const std::string &data_id) const;
+  boost::filesystem::path location(const std::string &data_id) const;
 
-        std::unordered_set<std::string> data_set() const;
+  std::unordered_set<std::string> data_set() const;
 
-    private:
-        tests *m_tests = nullptr;
-        std::string m_test_id;
-    };
-}}}
+ private:
+  tests *m_tests = nullptr;
+  std::string m_test_id;
+};
+
+}  // namespace single
+}  // namespace system
+}  // namespace bacs

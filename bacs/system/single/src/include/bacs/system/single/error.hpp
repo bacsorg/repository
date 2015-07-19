@@ -2,35 +2,28 @@
 
 #include <bacs/system/error.hpp>
 
-namespace bacs{namespace system{namespace single
-{
-    struct error: virtual bacs::system::error {};
+namespace bacs {
+namespace system {
+namespace single {
 
-    struct invalid_argument_error: virtual error
-    {
-        typedef boost::error_info<
-            struct tag_argument,
-            std::string
-        > argument;
-    };
+struct error : virtual bacs::system::error {};
 
-    struct test_group_error: virtual error
-    {
-        typedef boost::error_info<
-            struct tag_test_group,
-            std::string
-        > test_group;
-    };
-    struct test_group_dependency_error:
-        virtual test_group_error
-    {
-        typedef boost::error_info<
-            struct tag_test_group,
-            std::string
-        > test_group_dependency;
-    };
-    struct test_group_dependency_not_found_error:
-        virtual test_group_dependency_error {};
-    struct test_group_circular_dependencies_error:
-        virtual test_group_dependency_error {};
-}}}
+struct invalid_argument_error : virtual error {
+  using argument = boost::error_info<struct tag_argument, std::string>;
+};
+
+struct test_group_error : virtual error {
+  using test_group = boost::error_info<struct tag_test_group, std::string>;
+};
+struct test_group_dependency_error : virtual test_group_error {
+  using test_group_dependency =
+      boost::error_info<struct tag_test_group, std::string>;
+};
+struct test_group_dependency_not_found_error
+    : virtual test_group_dependency_error {};
+struct test_group_circular_dependencies_error
+    : virtual test_group_dependency_error {};
+
+}  // namespace single
+}  // namespace system
+}  // namespace bacs

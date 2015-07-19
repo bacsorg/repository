@@ -11,27 +11,28 @@
 
 #include <memory>
 
-namespace bacs{namespace system{namespace single
-{
-    /// \note must be implemented in problem
-    class checker: private boost::noncopyable
-    {
-    public:
-        static problem::single::result::Judge::Status return_cast(const int exit_status);
+namespace bacs {
+namespace system {
+namespace single {
 
-    public:
-        explicit checker(
-            const yandex::contest::invoker::ContainerPointer &container);
-        ~checker();
+/// \note must be implemented in problem
+class checker : private boost::noncopyable {
+ public:
+  static problem::single::result::Judge::Status return_cast(int exit_status);
 
-        bool check(
-            const file_map &test_files,
-            const file_map &solution_files,
-            problem::single::result::Judge &result);
+ public:
+  explicit checker(const yandex::contest::invoker::ContainerPointer &container);
+  ~checker();
 
-    private:
-        class impl;
+  bool check(const file_map &test_files, const file_map &solution_files,
+             problem::single::result::Judge &result);
 
-        std::unique_ptr<impl> pimpl;
-    };
-}}}
+ private:
+  class impl;
+
+  std::unique_ptr<impl> pimpl;
+};
+
+}  // namespace single
+}  // namespace system
+}  // namespace bacs
