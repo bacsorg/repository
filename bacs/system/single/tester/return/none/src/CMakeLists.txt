@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(bacs_system_single)
+project(bacs_single_system_tester_result_mapper)
 
 if(BunsanCMakeBuiltin)
     BunsanCMakeLoad()
@@ -8,15 +8,13 @@ else()
     find_package(BunsanCMake CONFIG REQUIRED)
 endif()
 
-bunsan_add_executable(${PROJECT_NAME}
-    src/bin/main.cpp
+bunsan_add_module_library(${PROJECT_NAME}
+    src/none.cpp
 )
+# FIXME no linkage requirement
 bunsan_use_bunsan_package(${PROJECT_NAME} bunsan_bacs_system_single
     bunsan_bacs_system_single
 )
 
-bunsan_install_headers()
 bunsan_install_targets(${PROJECT_NAME})
-#bunsan_install_project()
-
-#bunsan_include_tests()
+bunsan_install_project()
