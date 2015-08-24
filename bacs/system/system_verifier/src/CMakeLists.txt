@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(bacs_single_system_verifier)
+project(bacs_system_system_verifier)
 
 if(BunsanCMakeBuiltin)
     BunsanCMakeLoad()
