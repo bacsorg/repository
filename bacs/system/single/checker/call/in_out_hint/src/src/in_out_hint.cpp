@@ -108,7 +108,7 @@ bool in_out_hint_checker::check(const file_map &test_files,
       result.set_status(problem::single::JudgeResult::OK);
       break;
     case bacs::process::ExecutionResult::ABNORMAL_EXIT:
-      if (checker_execution.has_exit_status()) {
+      if (!checker_execution.term_sig()) {
         result.set_status(m_mapper->map(checker_execution.exit_status()));
       } else {
         result.set_status(problem::single::JudgeResult::FAILED);

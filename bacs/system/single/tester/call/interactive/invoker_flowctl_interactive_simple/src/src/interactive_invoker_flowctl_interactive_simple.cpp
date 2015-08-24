@@ -223,13 +223,13 @@ bool interactive_invoker_flowctl_interactive_simple_tester::test(
     judge.set_status(problem::single::JudgeResult::SKIPPED);
     goto return_;
   }
-  if (!broker_execution.has_exit_status()) goto failed_;
+  if (broker_execution.term_sig()) goto failed_;
   switch (broker_execution.status()) {
     case bacs::process::ExecutionResult::OK:
     case bacs::process::ExecutionResult::ABNORMAL_EXIT:
       switch (broker_execution.exit_status()) {
         case Broker::SOLUTION_TERMINATION_REAL_TIME_LIMIT_EXCEEDED:
-          if (!interactor_execution.has_exit_status()) {
+          if (interactor_execution.term_sig()) {
             judge.set_status(problem::single::JudgeResult::
                                  TERMINATION_REAL_TIME_LIMIT_EXCEEDED);
           } else if (m_mapper->map(interactor_execution.exit_status()) ==
@@ -247,7 +247,7 @@ bool interactive_invoker_flowctl_interactive_simple_tester::test(
           break;
         case Broker::OK:
         broker_ok_:
-          if (!interactor_execution.has_exit_status()) goto failed_;
+          if (interactor_execution.term_sig()) goto failed_;
           judge.set_status(m_mapper->map(interactor_execution.exit_status()));
           switch (judge.status()) {
             case problem::single::JudgeResult::INSUFFICIENT_DATA:

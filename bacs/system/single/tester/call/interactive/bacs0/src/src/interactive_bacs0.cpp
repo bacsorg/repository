@@ -168,7 +168,7 @@ bool interactive_bacs0_tester::test(
       judge.set_status(problem::single::JudgeResult::OK);
       break;
     case bacs::process::ExecutionResult::ABNORMAL_EXIT:
-      if (interactor_execution.has_exit_status()) {
+      if (!interactor_execution.term_sig()) {
         judge.set_status(m_mapper->map(interactor_execution.exit_status()));
         switch (judge.status()) {
           case problem::single::JudgeResult::INSUFFICIENT_DATA:

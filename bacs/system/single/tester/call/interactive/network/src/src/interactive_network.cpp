@@ -148,7 +148,7 @@ bool interactive_network_tester::test(
     judge.set_status(problem::single::JudgeResult::SKIPPED);
     goto return_;
   }
-  if (!interactor_execution.has_exit_status()) goto failed_;
+  if (interactor_execution.term_sig()) goto failed_;
   judge.set_status(m_mapper->map(interactor_execution.exit_status()));
   switch (judge.status()) {
     case problem::single::JudgeResult::INSUFFICIENT_DATA:
