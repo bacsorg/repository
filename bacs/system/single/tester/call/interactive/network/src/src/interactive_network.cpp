@@ -64,7 +64,7 @@ BUNSAN_PLUGIN_AUTO_REGISTER(tester, interactive_network_tester,
 bool interactive_network_tester::test(
     const problem::single::process::Settings &settings,
     const test::storage::test &test,
-    problem::single::TestResult &result) override {
+    problem::single::TestResult &result) {
   m_util.reset();
 
   const boost::filesystem::path testing_path =
