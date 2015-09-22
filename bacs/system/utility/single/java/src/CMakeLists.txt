@@ -1,6 +1,6 @@
-project(bunsan_bacs_utility_single_java)
-
 cmake_minimum_required(VERSION 3.0)
+
+project(bacs_utility_single_java)
 
 find_package(Java REQUIRED)
 include(UseJava)

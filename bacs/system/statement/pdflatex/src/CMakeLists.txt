@@ -1,6 +1,6 @@
-project(statement_pdflatex)
-
 cmake_minimum_required(VERSION 3.0)
+
+project(bacs_system_statement_pdflatex)
 
 find_package(LATEX)
 

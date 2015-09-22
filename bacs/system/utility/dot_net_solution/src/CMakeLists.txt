@@ -1,6 +1,6 @@
-project(bunsan_bacs_utility_dot_net_solution)
-
 cmake_minimum_required(VERSION 3.0)
+
+project(bacs_utility_dot_net_solution)
 
 # Default values, may be overwritten in modules
 set(configuration Release)
@@ -18,7 +18,7 @@ foreach(lib ${libraries})
     list(APPEND dot_net_libs ${lib_path})
 endforeach()
 add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/${target}/bin/${target}
-    COMMAND bunsan_bacs_system_build_mono_develop
+    COMMAND bacs_system_build_mono_develop
             --fhs
             --output ${PROJECT_BINARY_DIR}/${target}
             --executable ${target}

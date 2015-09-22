@@ -11,8 +11,8 @@ endif()
 bunsan_add_executable(${PROJECT_NAME}
     src/bin/main.cpp
 )
-bunsan_use_bunsan_package(${PROJECT_NAME} bunsan_bacs_system_single
-    bunsan_bacs_system_single
+bunsan_use_bunsan_package(${PROJECT_NAME} bacs_system_single
+    bacs_system_single
 )
 
 #bunsan_install_headers()

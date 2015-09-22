@@ -1,6 +1,6 @@
-project(bunsan_bacs_lib_pas)
-
 cmake_minimum_required(VERSION 3.0)
+
+project(bacs_lib_pas)
 
 file(GLOB sources src/*.pas src/*.dpr)
 
