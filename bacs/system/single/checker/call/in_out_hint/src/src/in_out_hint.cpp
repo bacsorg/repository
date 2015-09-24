@@ -40,8 +40,8 @@ class in_out_hint_checker : public checker {
   }
 
  private:
-  ContainerPointer m_container;
-  result_mapper_uptr m_mapper;
+  const ContainerPointer m_container;
+  const result_mapper_uptr m_mapper;
 };
 
 BUNSAN_PLUGIN_AUTO_REGISTER(checker, in_out_hint_checker,
