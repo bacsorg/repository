@@ -9,6 +9,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 namespace bacs {
 namespace system {
@@ -27,7 +28,7 @@ class in_out_hint_checker : public checker {
   in_out_hint_checker(
       const yandex::contest::invoker::ContainerPointer &container,
       result_mapper_uptr mapper)
-      : m_container(container), m_mapper(std::move(mapper)) {
+      : m_env(load_env()), m_container(container), m_mapper(std::move(mapper)) {
     BOOST_ASSERT(m_container);
     BOOST_ASSERT(m_mapper);
   }
@@ -40,6 +41,13 @@ class in_out_hint_checker : public checker {
   }
 
  private:
+  static boost::property_tree::ptree load_env() {
+    boost::property_tree::ptree cfg;
+    boost::property_tree::read_ini("etc/checker", cfg);
+    return cfg;
+  }
+
+  const boost::property_tree::ptree m_env;
   const ContainerPointer m_container;
   const result_mapper_uptr m_mapper;
 };
@@ -89,6 +97,9 @@ bool in_out_hint_checker::check(const file_map &test_files,
   process->setStream(2, FdAlias(1));
   process->setStream(1, File(checking_log, AccessMode::WRITE_ONLY));
   // TODO process->setResourceLimits()
+  for (const auto &env : m_env) {
+    process->setEnvironment(env.first, env.second.get_value<std::string>());
+  }
 
   // execute
   const ProcessGroup::Result process_group_result =
