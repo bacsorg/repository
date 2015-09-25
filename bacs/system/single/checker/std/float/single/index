@@ -11,5 +11,17 @@ source
         {
             "." "bacs/system/utility/single/c_cpp"
         }
+        package
+        {
+            "." "bacs/lib/cpp/testlib.googlecode.com-0.9.5"
+        }
+    }
+}
+package
+{
+    import
+    {
+        "." "bacs/system/single/checker/call/in_out_hint"
+        "." "bacs/system/single/checker/return/testlib"
     }
 }
