@@ -21,7 +21,10 @@ package
 {
     import
     {
-        "." "bacs/system/single/checker/call/in_out_hint"
-        "." "bacs/system/single/checker/return/testlib"
+        package
+        {
+            "." "bacs/system/single/checker/call/in_out_hint"
+            "." "bacs/system/single/checker/return/testlib"
+        }
     }
 }
