@@ -1,15 +1,13 @@
-source
 {
-    import
-    {
-        source
-        {
-            . bacs/lib/pas
-        }
-    }
-    self
-    {
-        src src
-        modules modules
+    "source": {
+        "import": {
+            "source": [
+                {"path": ".", "package": "bacs/lib/pas"}
+            ]
+        },
+        "self": [
+            {"path": "src", "source": "src"},
+            {"path": "modules", "source": "modules"}
+        ]
     }
 }

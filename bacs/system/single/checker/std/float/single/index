@@ -1,30 +1,24 @@
-source
 {
-    self
-    {
-        "modules" "modules"
-        "src" "src"
-    }
-    import
-    {
-        source
-        {
-            "." "bacs/system/utility/single/c_cpp"
+    "source": {
+        "self": [
+            {"path": "modules", "source": "modules"},
+            {"path": "src", "source": "src"}
+        ],
+        "import": {
+            "source": [
+                {"path": ".", "package": "bacs/system/utility/single/c_cpp"}
+            ],
+            "package": [
+                {"path": ".", "package": "bacs/lib/cpp/testlib.googlecode.com-0.9.5"}
+            ]
         }
-        package
-        {
-            "." "bacs/lib/cpp/testlib.googlecode.com-0.9.5"
-        }
-    }
-}
-package
-{
-    import
-    {
-        package
-        {
-            "." "bacs/system/single/checker/call/in_out_hint"
-            "." "bacs/system/single/checker/return/testlib"
+    },
+    "package": {
+        "import": {
+            "package": [
+                {"path": ".", "package": "bacs/system/single/checker/call/in_out_hint"},
+                {"path": ".", "package": "bacs/system/single/checker/return/testlib"}
+            ]
         }
     }
 }

@@ -1,10 +1,9 @@
-source
 {
-    import
-    {
-        source
-        {
-            . bacs/system/utility/single/c_cpp
+    "source": {
+        "import": {
+            "source": [
+                {"path": ".", "source": "bacs/system/utility/single/c_cpp"}
+            ]
         }
     }
 }

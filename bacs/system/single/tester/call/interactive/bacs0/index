@@ -1,7 +1,7 @@
-source
 {
-    self
-    {
-        . src
+    "source": {
+        "self": [
+            {"path": ".", "source": "src"}
+        ]
     }
 }
