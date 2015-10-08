@@ -5,7 +5,7 @@
         ],
         "import": {
             "source": [
-                {"path": ".", "source": "bacs/system/utility/single/c_cpp_flags"}
+                {"path": ".", "package": "bacs/system/utility/single/c_cpp_flags"}
             ]
         }
     }

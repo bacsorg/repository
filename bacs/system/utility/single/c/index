@@ -2,7 +2,7 @@
     "source": {
         "import": {
             "source": [
-                {"path": ".", "source": "bacs/system/utility/single/c_cpp"}
+                {"path": ".", "package": "bacs/system/utility/single/c_cpp"}
             ]
         }
     }
