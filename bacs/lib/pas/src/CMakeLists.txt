@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 project(bacs_lib_pas)
 
+find_package(BacsCommon CONFIG REQUIRED)
+bacs_worker_project()
+
 file(GLOB sources src/*.pas src/*.dpr)
 
 set(src_dir ${PROJECT_SOURCE_DIR}/src)

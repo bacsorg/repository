@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 project(bacs_lib_cpp)
 
+find_package(BacsCommon CONFIG REQUIRED)
+bacs_worker_project()
+
 #file(GLOB sources src/*.cpp src/*.cc)
 file(GLOB includes include/*.h include/*.hpp)
 

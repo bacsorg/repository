@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 project(bacs_utility_single_java)
 
+find_package(BacsCommon CONFIG REQUIRED)
+bacs_worker_project()
+
 find_package(Java REQUIRED)
 include(UseJava)
 

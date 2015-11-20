@@ -2,11 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(bacs_system_single_checker_result_mapper)
 
-if(BunsanCMakeBuiltin)
-    BunsanCMakeLoad()
-else()
-    find_package(BunsanCMake CONFIG REQUIRED)
-endif()
+find_package(BacsCommon CONFIG REQUIRED)
+bacs_worker_project()
 
 bunsan_add_module_library(${PROJECT_NAME}
     src/testlib.cpp

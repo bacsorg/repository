@@ -2,9 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(bacs_system_single_list_tests_builder)
 
-include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
-
-find_package(BunsanCMake CONFIG REQUIRED)
+find_package(BacsCommon CONFIG REQUIRED)
+bacs_worker_project()
 
 bunsan_add_executable(${PROJECT_NAME}
     src/main.cpp

@@ -1,1 +1,1 @@
-install(FILES ${binaries} ${includes} DESTINATION lib/Lopatin)
+install(FILES ${binaries} ${includes} DESTINATION ${CMAKE_INSTALL_LIBDIR}/Lopatin)
