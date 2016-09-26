@@ -11,6 +11,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <bunsan/serialization/unordered_set.hpp>
 
+#include <iostream>
 #include <unordered_set>
 
 namespace {
