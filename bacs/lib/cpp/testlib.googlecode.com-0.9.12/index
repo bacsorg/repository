@@ -1,0 +1,13 @@
+{
+    "source": {
+        "import": {
+            "source": [
+                {"path": ".", "package": "bacs/lib/cpp"}
+            ]
+        },
+        "self": [
+            {"path": "include", "source": "include"},
+            {"path": "modules", "source": "modules"}
+        ]
+    }
+}
